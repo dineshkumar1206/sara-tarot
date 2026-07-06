@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@theme {
+  --color-astrology-deepBg: #0f0c1b;
+  --color-astrology-mysticPurple: #2d1b4e;
+  --color-astrology-gold: #dfba6b;
+  --color-astrology-goldHover: #c9a353;
+  --color-astrology-textLight: #f3f0ea;
+}
