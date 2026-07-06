@@ -1,18 +1,23 @@
-import React from 'react';
-import Home from './pages/Home';
+import React, { useState } from 'react';
 import Navbar from './components/Navbar';
+import Products from './home/Products';
+import Home from './pages/Home';
 
+export default function App() {
+  // Global Shared States passed into child configurations
+  const [cart, setCart] = useState([]);
+  const [currentView, setCurrentView] = useState({ page: 'list', serviceId: null });
 
-function App() {
   return (
-    <div className="min-h-screen bg-[#0f0c1b] text-[#f3f0ea] font-sans antialiased">
-      <Navbar/>
-      <main>
-        <Home/>
-      </main>
-
+    <div>
+      <Navbar cartCount={cart.length} />
+      <Home/>
+      <Products 
+        cart={cart} 
+        setCart={setCart} 
+        currentView={currentView} 
+        setCurrentView={setCurrentView} 
+      />
     </div>
   );
 }
-
-export default App;
