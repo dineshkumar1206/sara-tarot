@@ -20,7 +20,7 @@ export default function Navbar() {
         style={{
           maxWidth: '1240px',
           margin: '0 auto',
-          padding: '0.75rem 2rem', // Reduced padding vertically to accommodate the logo height cleanly
+          padding: '0.5rem 2rem', // Slightly reduced vertical padding to perfectly frame the larger logo
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -34,7 +34,7 @@ export default function Navbar() {
             src="/saraa-logo.jpeg" 
             alt="Saraa Tarot Logo" 
             style={{
-              height: '55px', // Uniform, sleek height configuration
+              height: '85px', 
               width: 'auto',
               display: 'block',
               borderRadius: '4px' // Subtle rounding to fit the canvas image corners
