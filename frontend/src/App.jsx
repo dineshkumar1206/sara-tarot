@@ -1,55 +1,72 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Products from './home/Products';
 import Home from './pages/Home';
 import Checkout from './components/Checkout';
 import Footer from './components/Footer';
-import ScrollToTop from './components/ScrollToTop'; // Updated import name
+import ScrollToTop from './components/ScrollToTop';
+import ProductCategoryDetail from './pages/ProductCategoryDetail';
 
 export default function App() {
-  // Global Shared States passed into child configurations
   const [cart, setCart] = useState([]);
-  const [currentView, setCurrentView] = useState({ page: 'list', serviceId: null });
-  const isFirstRender = useRef(true);
+  const location = useLocation();
 
-  // Safe, non-blocking page transition scroll handling
+  // Scroll to top on path change
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
+    // If there is a hash (e.g., #about), handle scrolling after route changes
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
     }
-    
-    // Uses native smooth scrolling that releases immediately, allowing users to scroll down!
+
+    // Default to top scroll
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
-  }, [currentView.page]);
+  }, [location.pathname, location.hash]);
 
   return (
     <div>
-      <Navbar cartItems={cart} setCartItems={setCart} setCurrentView={setCurrentView} />
+      <Navbar cartItems={cart} setCartItems={setCart} />
+      <ScrollToTop />
       
-      {currentView.page === 'checkout' ? (
-        <Checkout 
-          cartItems={cart} 
-          setCartItems={setCart} 
-          setCurrentView={setCurrentView} 
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            <>
+              <Home />
+              <Products cart={cart} setCart={setCart} />
+            </>
+          } 
         />
-      ) : (
-        <>
-          <ScrollToTop/>
-          <Home/>
-          <Products 
-            cart={cart} 
-            setCart={setCart} 
-            currentView={currentView} 
-            setCurrentView={setCurrentView} 
-          />
-        </>
-      )}
+        <Route 
+          path="/checkout" 
+          element={
+            <Checkout 
+              cartItems={cart} 
+              setCartItems={setCart} 
+            />
+          } 
+        />
+        <Route 
+          path="/products/:category" 
+          element={
+            <ProductCategoryDetail 
+              cart={cart} 
+              setCart={setCart} 
+            />
+          } 
+        />
+      </Routes>
       
-      <Footer setCurrentView={setCurrentView} />
+      <Footer />
     </div>
   );
 }

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Configure merchant payment details
 const WHATSAPP_PHONE = '919999999999'; // WhatsApp number with country code (e.g., 91 for India, no spaces or +)
 const MERCHANT_UPI_ID = '50100234981123@hdfcbank'; // HDFC current account UPI ID
 const MERCHANT_NAME = 'SARAA TAROT SERVICES';
 
-export default function Checkout({ cartItems = [], setCartItems, setCurrentView }) {
+export default function Checkout({ cartItems = [], setCartItems }) {
+  const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('qr'); // Only 'qr' is active per request
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -116,7 +118,7 @@ export default function Checkout({ cartItems = [], setCartItems, setCurrentView 
             </a>
             
             <button 
-              onClick={() => setCurrentView({ page: 'list', serviceId: null })}
+              onClick={() => navigate('/')}
               style={{
                 backgroundColor: 'transparent',
                 color: '#dfba6b',
@@ -171,7 +173,7 @@ export default function Checkout({ cartItems = [], setCartItems, setCurrentView 
         
         {/* Header Navigation link */}
         <button 
-          onClick={() => setCurrentView({ page: 'list', serviceId: null })}
+          onClick={() => navigate('/')}
           style={{
             backgroundColor: 'transparent',
             border: 'none',

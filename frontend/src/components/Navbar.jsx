@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 
-export default function Navbar({ cartItems = [], setCartItems, setCurrentView }) {
+export default function Navbar({ cartItems = [], setCartItems }) {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false); // Mobile menu toggle
   const [isCartOpen, setIsCartOpen] = useState(false); // Cart drawer toggle
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Desktop dropdown toggle
+  const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false); // Mobile sub-menu toggle
 
   // Calculate totals
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -51,9 +55,9 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
         }}
       >
         {/* Brand Logo Identity */}
-        <div 
-          onClick={() => setCurrentView && setCurrentView({ page: 'list', serviceId: null })}
-          style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+        <Link 
+          to="/"
+          style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', textDecoration: 'none' }}
         >
           <img 
             src="/saraa-logo.jpeg" 
@@ -65,7 +69,7 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
               borderRadius: '4px' 
             }} 
           />
-        </div>
+        </Link>
 
         {/* Desktop & Tablet Navigation Menu */}
         <div 
@@ -80,7 +84,8 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
             style={{
               listStyle: 'none',
               display: 'flex',
-              gap: '2rem',
+              alignItems: 'center',
+              gap: '2.25rem',
               margin: 0,
               padding: 0,
               fontFamily: "'Inter', sans-serif",
@@ -90,29 +95,118 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
               letterSpacing: '1.5px'
             }}
           >
-            {['Home', 'About', 'Contact'].map((item) => (
-              <li key={item}>
-                <a 
-                  href={`#${item.toLowerCase()}`}
-                  onClick={() => {
-                    if (item === 'Home' && setCurrentView) {
-                      setCurrentView({ page: 'list', serviceId: null });
-                    }
-                  }}
+            <li>
+              <Link 
+                to="/" 
+                style={{ color: '#f3f0ea', textDecoration: 'none', transition: 'color 0.3s ease' }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#dfba6b'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#f3f0ea'}
+              >
+                Home
+              </Link>
+            </li>
+            
+            {/* Products Hover Dropdown */}
+            <li 
+              onMouseEnter={() => setIsDropdownOpen(true)}
+              onMouseLeave={() => setIsDropdownOpen(false)}
+              style={{ position: 'relative', padding: '1.5rem 0', cursor: 'pointer' }}
+            >
+              <span 
+                style={{ 
+                  color: isDropdownOpen ? '#dfba6b' : '#f3f0ea', 
+                  transition: 'color 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                Products
+                <svg width="8" height="5" viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M1 1l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              
+              {/* Dropdown Options */}
+              {isDropdownOpen && (
+                <div 
                   style={{
-                    color: item === 'Home' ? '#dfba6b' : '#f3f0ea',
-                    textDecoration: 'none',
-                    transition: 'color 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#dfba6b'}
-                  onMouseLeave={(e) => {
-                    if (item !== 'Home') e.currentTarget.style.color = '#f3f0ea';
+                    position: 'absolute',
+                    top: '100%',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    backgroundColor: '#130f24',
+                    border: '1px solid rgba(223, 186, 107, 0.25)',
+                    borderRadius: '4px',
+                    width: '280px',
+                    padding: '0.75rem 0',
+                    boxShadow: '0 12px 30px rgba(0,0,0,0.6)',
+                    zIndex: 1100,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    boxSizing: 'border-box'
                   }}
                 >
-                  {item}
-                </a>
-              </li>
-            ))}
+                  {[
+                    { label: 'Tarot Private Consultation', path: '/products/tarot-consultation' },
+                    { label: 'Spiritual Healing', path: '/products/spiritual-healing' },
+                    { label: 'Blessed Crystals', path: '/products/crystals' },
+                    { label: 'Murugar Cards', path: '/products/murugar-cards' },
+                    { label: 'Tarot Reading Classes', path: '/products/tarot-classes' },
+                    { label: 'Spiritual Counseling', path: '/products/counseling-classes' },
+                    { label: 'Kali Pooja', path: '/products/kali-pooja' }
+                  ].map((subItem) => (
+                    <Link
+                      key={subItem.path}
+                      to={subItem.path}
+                      style={{
+                        padding: '0.75rem 1.5rem',
+                        color: '#f3f0ea',
+                        textDecoration: 'none',
+                        fontSize: '11px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                        transition: 'all 0.2s ease',
+                        textAlign: 'left'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(223, 186, 107, 0.1)';
+                        e.currentTarget.style.color = '#dfba6b';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = '#f3f0ea';
+                      }}
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      {subItem.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </li>
+
+            <li>
+              <Link 
+                to="/#about" 
+                style={{ color: '#f3f0ea', textDecoration: 'none', transition: 'color 0.3s ease' }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#dfba6b'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#f3f0ea'}
+              >
+                About
+              </Link>
+            </li>
+
+            <li>
+              <Link 
+                to="/#contact" 
+                style={{ color: '#f3f0ea', textDecoration: 'none', transition: 'color 0.3s ease' }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#dfba6b'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#f3f0ea'}
+              >
+                Contact
+              </Link>
+            </li>
           </ul>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -239,30 +333,143 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
           }}
         >
           <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {['Home', 'About', 'Contact'].map((item) => (
-              <li key={item}>
-                <a 
-                  href={`#${item.toLowerCase()}`}
-                  onClick={() => {
-                    setIsOpen(false);
-                    if (item === 'Home' && setCurrentView) {
-                      setCurrentView({ page: 'list', serviceId: null });
-                    }
-                  }}
+            <li>
+              <Link 
+                to="/"
+                onClick={() => setIsOpen(false)}
+                style={{
+                  color: '#f3f0ea',
+                  textDecoration: 'none',
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '14px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  display: 'block'
+                }}
+              >
+                Home
+              </Link>
+            </li>
+
+            {/* Mobile Products Accordion Trigger */}
+            <li>
+              <button 
+                onClick={() => setIsMobileProductsOpen(!isMobileProductsOpen)}
+                style={{
+                  width: '100%',
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  color: '#f3f0ea',
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '14px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  textAlign: 'left'
+                }}
+              >
+                <span>Products</span>
+                <svg 
+                  width="10" 
+                  height="6" 
+                  viewBox="0 0 10 6" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2"
                   style={{
-                    color: item === 'Home' ? '#dfba6b' : '#f3f0ea',
-                    textDecoration: 'none',
-                    fontFamily: "'Inter', sans-serif",
-                    fontSize: '15px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px',
-                    display: 'block'
+                    transform: isMobileProductsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease'
                   }}
                 >
-                  {item}
-                </a>
-              </li>
-            ))}
+                  <path d="M1 1l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+
+              {/* Mobile Products Sub-menu Links */}
+              {isMobileProductsOpen && (
+                <div 
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.9rem',
+                    padding: '0.8rem 0 0.2rem 1rem',
+                    borderLeft: '1px solid rgba(223, 186, 107, 0.2)',
+                    marginTop: '0.5rem',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  {[
+                    { label: 'Tarot Private Consultation', path: '/products/tarot-consultation' },
+                    { label: 'Spiritual Healing', path: '/products/spiritual-healing' },
+                    { label: 'Blessed Crystals', path: '/products/crystals' },
+                    { label: 'Murugar Cards', path: '/products/murugar-cards' },
+                    { label: 'Tarot Reading Classes', path: '/products/tarot-classes' },
+                    { label: 'Spiritual Counseling', path: '/products/counseling-classes' },
+                    { label: 'Kali Pooja', path: '/products/kali-pooja' }
+                  ].map((subItem) => (
+                    <Link
+                      key={subItem.path}
+                      to={subItem.path}
+                      onClick={() => {
+                        setIsOpen(false);
+                        setIsMobileProductsOpen(false);
+                      }}
+                      style={{
+                        color: 'rgba(243, 240, 234, 0.85)',
+                        textDecoration: 'none',
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: '12px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                        display: 'block'
+                      }}
+                    >
+                      {subItem.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </li>
+
+            <li>
+              <Link 
+                to="/#about"
+                onClick={() => setIsOpen(false)}
+                style={{
+                  color: '#f3f0ea',
+                  textDecoration: 'none',
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '14px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  display: 'block'
+                }}
+              >
+                About
+              </Link>
+            </li>
+
+            <li>
+              <Link 
+                to="/#contact"
+                onClick={() => setIsOpen(false)}
+                style={{
+                  color: '#f3f0ea',
+                  textDecoration: 'none',
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '14px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  display: 'block'
+                }}
+              >
+                Contact
+              </Link>
+            </li>
             
             <li style={{ marginTop: '0.75rem' }}>
               <button 
@@ -430,9 +637,7 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
                 <button 
                   onClick={() => {
                     setIsCartOpen(false);
-                    if (setCurrentView) {
-                      setCurrentView({ page: 'checkout' });
-                    }
+                    navigate('/checkout');
                   }}
                   style={{
                     width: '100%',

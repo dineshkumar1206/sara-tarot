@@ -60,7 +60,7 @@ export default function AbtSara() {
   };
 
   return (
-    <div ref={sectionRef} style={styles.page}>
+    <div ref={sectionRef} id="about" style={styles.page}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Poppins:wght@300;400;500;600&display=swap');
 

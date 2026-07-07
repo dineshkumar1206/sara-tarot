@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-export default function Footer({ setCurrentView }) {
+export default function Footer() {
+  const navigate = useNavigate();
   // Reusable payment SVGs
   const VisaIcon = () => (
     <svg width="32" height="20" viewBox="0 0 32 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.6 }}>
@@ -33,6 +35,7 @@ export default function Footer({ setCurrentView }) {
 
   return (
     <footer 
+      id="contact"
       style={{
         backgroundColor: '#0c0917',
         borderTop: '1px solid rgba(223, 186, 107, 0.15)',
@@ -170,18 +173,15 @@ export default function Footer({ setCurrentView }) {
             <span>•</span>
             <span>Mineralotherapy</span>
           </div>
-
           <button
             onClick={() => {
-              if (setCurrentView) {
-                setCurrentView({ page: 'list', serviceId: null });
-                setTimeout(() => {
-                  const productsSection = document.getElementById('products-section');
-                  if (productsSection) {
-                    productsSection.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }, 100);
-              }
+              navigate('/');
+              setTimeout(() => {
+                const productsSection = document.getElementById('products-section');
+                if (productsSection) {
+                  productsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }, 100);
             }}
             style={{
               backgroundColor: 'transparent',

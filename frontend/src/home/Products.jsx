@@ -48,7 +48,8 @@ const SERVICES_DATA = [
   }
 ];
 
-export default function Products({ cart = [], setCart, currentView = { page: 'list', serviceId: null }, setCurrentView }) {
+export default function Products({ cart = [], setCart }) {
+  const [activeServiceId, setActiveServiceId] = React.useState(null);
 
   const handleAddToCart = (service, e) => {
     e.stopPropagation(); 
@@ -79,18 +80,14 @@ export default function Products({ cart = [], setCart, currentView = { page: 'li
 
   const handleOpenPopup = (serviceId, e) => {
     e.stopPropagation(); 
-    if (setCurrentView) {
-      setCurrentView({ page: 'detail', serviceId: serviceId });
-    }
+    setActiveServiceId(serviceId);
   };
 
   const handleClosePopup = () => {
-    if (setCurrentView) {
-      setCurrentView({ page: 'list', serviceId: null });
-    }
+    setActiveServiceId(null);
   };
 
-  const currentService = SERVICES_DATA.find(s => s.id === currentView.serviceId);
+  const currentService = SERVICES_DATA.find(s => s.id === activeServiceId);
 
   return (
     <div id="products-section" style={{ backgroundColor: '#0f0c1b', minHeight: '100vh', color: '#f3f0ea', fontFamily: "'Inter', sans-serif", position: 'relative' }}>
@@ -206,7 +203,7 @@ export default function Products({ cart = [], setCart, currentView = { page: 'li
       </div>
 
       {/* --- DETAILS MODAL POPUP --- */}
-      {currentView.page === 'detail' && currentService && (
+      {activeServiceId && currentService && (
         <div 
           onClick={handleClosePopup} // Closes popup when clicking overlay background
           style={{
