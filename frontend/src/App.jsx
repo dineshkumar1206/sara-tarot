@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Products from './home/Products';
 import Home from './pages/Home';
+import Checkout from './components/Checkout';
 
 export default function App() {
   // Global Shared States passed into child configurations
@@ -10,14 +11,24 @@ export default function App() {
 
   return (
     <div>
-      <Navbar cartCount={cart.length} />
-      <Home/>
-      <Products 
-        cart={cart} 
-        setCart={setCart} 
-        currentView={currentView} 
-        setCurrentView={setCurrentView} 
-      />
+      <Navbar cartItems={cart} setCartItems={setCart} setCurrentView={setCurrentView} />
+      {currentView.page === 'checkout' ? (
+        <Checkout 
+          cartItems={cart} 
+          setCartItems={setCart} 
+          setCurrentView={setCurrentView} 
+        />
+      ) : (
+        <>
+          <Home/>
+          <Products 
+            cart={cart} 
+            setCart={setCart} 
+            currentView={currentView} 
+            setCurrentView={setCurrentView} 
+          />
+        </>
+      )}
     </div>
   );
 }

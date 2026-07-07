@@ -1,7 +1,43 @@
 import React, { useState } from 'react';
 
-export default function Navbar({ cartCount = 0 }) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function Navbar({ cartItems = [], setCartItems, setCurrentView }) {
+  const [isOpen, setIsOpen] = useState(false); // Mobile menu toggle
+  const [isCartOpen, setIsCartOpen] = useState(false); // Cart drawer toggle
+
+  // Calculate totals
+  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const itemsTotalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  
+  // Example arbitrary handling and delivery values to replicate the image layout
+  const handlingCharge = cartItems.length > 0 ? 4 : 0;
+  const deliveryFee = cartItems.length > 0 ? 29 : 0;
+  const grandTotal = itemsTotalAmount + handlingCharge + deliveryFee;
+
+  // Handler functions to sync quantities inside the cart drawer
+  const updateQuantity = (id, delta) => {
+    const updated = cartItems
+      .map((item) => {
+        if (item.id === id) {
+          return { ...item, quantity: item.quantity + delta };
+        }
+        return item;
+      })
+      .filter((item) => item.quantity > 0); // Removes item if count reaches 0
+    setCartItems(updated);
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
+  // Reusable Cart Icon SVG component
+  const CartIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="21" r="1"></circle>
+      <circle cx="20" cy="21" r="1"></circle>
+      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+    </svg>
+  );
 
   return (
     <nav 
@@ -27,7 +63,10 @@ export default function Navbar({ cartCount = 0 }) {
         }}
       >
         {/* Brand Logo Identity */}
-        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+        <div 
+          onClick={() => setCurrentView && setCurrentView({ page: 'list', serviceId: null })}
+          style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+        >
           <img 
             src="/saraa-logo.jpeg" 
             alt="Saraa Tarot Logo" 
@@ -67,6 +106,11 @@ export default function Navbar({ cartCount = 0 }) {
               <li key={item}>
                 <a 
                   href={`#${item.toLowerCase()}`}
+                  onClick={() => {
+                    if (item === 'Home' && setCurrentView) {
+                      setCurrentView({ page: 'list', serviceId: null });
+                    }
+                  }}
                   style={{
                     color: item === 'Home' ? '#dfba6b' : '#f3f0ea',
                     textDecoration: 'none',
@@ -84,7 +128,9 @@ export default function Navbar({ cartCount = 0 }) {
           </ul>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            {/* Updated Cart Button */}
             <button
+              onClick={() => setIsCartOpen(true)}
               style={{
                 backgroundColor: 'rgba(223, 186, 107, 0.1)',
                 color: '#dfba6b',
@@ -105,7 +151,8 @@ export default function Navbar({ cartCount = 0 }) {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(223, 186, 107, 0.2)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(223, 186, 107, 0.1)'}
             >
-              <span>View Cart</span>
+              <CartIcon />
+              <span>Cart</span>
               <span style={{
                 backgroundColor: '#dfba6b',
                 color: '#0f0c1b',
@@ -118,36 +165,9 @@ export default function Navbar({ cartCount = 0 }) {
                 fontSize: '10px',
                 fontWeight: '700'
               }}>
-                {cartCount}
+                {totalItems}
               </span>
             </button>
-
-            {/* <button 
-              style={{
-                backgroundColor: 'transparent',
-                color: '#dfba6b',
-                border: '1px solid rgba(223, 186, 107, 0.4)',
-                borderRadius: '2px',
-                padding: '0.6rem 1.2rem',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '12px',
-                fontWeight: '500',
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#dfba6b';
-                e.currentTarget.style.color = '#0f0c1b';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#dfba6b';
-              }}
-            >
-              Card Reading
-            </button> */}
           </div>
         </div>
 
@@ -165,6 +185,7 @@ export default function Navbar({ cartCount = 0 }) {
         {/* Mobile & Tablet Action Corner */}
         <div className="mobile-toggle-box" style={{ display: 'none' }}>
           <button
+            onClick={() => setIsCartOpen(true)}
             style={{
               backgroundColor: 'transparent',
               color: '#dfba6b',
@@ -176,11 +197,7 @@ export default function Navbar({ cartCount = 0 }) {
               padding: '8px'
             }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
+            <CartIcon />
             <span style={{
               position: 'absolute',
               top: '-2px',
@@ -196,7 +213,7 @@ export default function Navbar({ cartCount = 0 }) {
               fontSize: '9px',
               fontWeight: '700'
             }}>
-              {cartCount}
+              {totalItems}
             </span>
           </button>
 
@@ -238,7 +255,12 @@ export default function Navbar({ cartCount = 0 }) {
               <li key={item}>
                 <a 
                   href={`#${item.toLowerCase()}`}
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    setIsOpen(false);
+                    if (item === 'Home' && setCurrentView) {
+                      setCurrentView({ page: 'list', serviceId: null });
+                    }
+                  }}
                   style={{
                     color: item === 'Home' ? '#dfba6b' : '#f3f0ea',
                     textDecoration: 'none',
@@ -254,8 +276,9 @@ export default function Navbar({ cartCount = 0 }) {
               </li>
             ))}
             
-            <li style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <li style={{ marginTop: '0.75rem' }}>
               <button 
+                onClick={() => { setIsOpen(false); setIsCartOpen(true); }}
                 style={{
                   width: '100%',
                   backgroundColor: 'rgba(223, 186, 107, 0.1)',
@@ -274,7 +297,8 @@ export default function Navbar({ cartCount = 0 }) {
                   gap: '8px'
                 }}
               >
-                <span>View Cart</span>
+                <CartIcon />
+                <span>Cart</span>
                 <span style={{
                   backgroundColor: '#dfba6b',
                   color: '#0f0c1b',
@@ -287,30 +311,163 @@ export default function Navbar({ cartCount = 0 }) {
                   fontSize: '10px',
                   fontWeight: '700'
                 }}>
-                  {cartCount}
+                  {totalItems}
                 </span>
               </button>
-
-              {/* <button 
-                style={{
-                  width: '100%',
-                  backgroundColor: '#dfba6b',
-                  color: '#0f0c1b',
-                  border: 'none',
-                  padding: '0.8rem',
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  cursor: 'pointer'
-                }}
-              >
-                Card Reading
-              </button> */}
             </li>
           </ul>
         </div>
+      )}
+
+      {/* ==================== RIGHT SIDE CART SLIDE-OUT DRAWER ==================== */}
+      {isCartOpen && (
+        <>
+          {/* Dark Blurred Backdrop Overlay */}
+          <div 
+            onClick={() => setIsCartOpen(false)}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(4px)',
+              zIndex: 2000
+            }}
+          />
+
+          {/* Drawer Panel Container */}
+          <div 
+            style={{
+              position: 'fixed',
+              top: 0,
+              right: 0,
+              width: '100%',
+              maxWidth: '420px',
+              height: '100vh',
+              backgroundColor: '#130f24', // Themes match base
+              borderLeft: '1px solid rgba(223, 186, 107, 0.2)',
+              boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
+              zIndex: 2001,
+              display: 'flex',
+              flexDirection: 'column',
+              fontFamily: "'Inter', sans-serif",
+              color: '#f3f0ea',
+              boxSizing: 'border-box'
+            }}
+          >
+            {/* Drawer Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem', borderBottom: '1px solid rgba(223, 186, 107, 0.15)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span style={{ fontSize: '18px', fontWeight: '600', letterSpacing: '0.5px' }}>My Cart</span>
+                <span style={{ backgroundColor: 'rgba(223, 186, 107, 0.15)', color: '#dfba6b', padding: '2px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: '500' }}>
+                  {totalItems} {totalItems === 1 ? 'Item' : 'Items'}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                {cartItems.length > 0 && (
+                  <button onClick={clearCart} style={{ background: 'none', border: 'none', color: '#a09ba2', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}>
+                    Clear All
+                  </button>
+                )}
+                <button onClick={() => setIsCartOpen(false)} style={{ background: 'none', border: 'none', color: '#dfba6b', cursor: 'pointer', fontSize: '20px' }}>
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Drawer Dynamic Body Scroll List */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
+              {cartItems.length === 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60%', color: '#a09ba2' }}>
+                  <CartIcon />
+                  <p style={{ marginTop: '1rem', fontSize: '14px' }}>Your cart is empty.</p>
+                </div>
+              ) : (
+                cartItems.map((item) => (
+                  <div key={item.id} style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', paddingBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.05)', alignItems: 'center' }}>
+                    <img 
+                      src={item.image || "/placeholder-item.jpg"} 
+                      alt={item.name} 
+                      style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid rgba(223, 186, 107, 0.1)' }} 
+                    />
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '500', color: '#f3f0ea' }}>{item.name}</h4>
+                      <p style={{ margin: 0, fontSize: '13px', color: '#dfba6b', fontWeight: '600' }}>₹{item.price}</p>
+                    </div>
+                    {/* Quantity Selector controls matched to layout logic */}
+                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(223, 186, 107, 0.3)', borderRadius: '4px', overflow: 'hidden' }}>
+                      <button onClick={() => updateQuantity(item.id, -1)} style={{ background: 'rgba(223, 186, 107, 0.05)', border: 'none', color: '#dfba6b', padding: '4px 10px', cursor: 'pointer', fontWeight: 'bold' }}>-</button>
+                      <span style={{ padding: '0 8px', fontSize: '13px', minWidth: '16px', textAlign: 'center' }}>{item.quantity}</span>
+                      <button onClick={() => updateQuantity(item.id, 1)} style={{ background: 'rgba(223, 186, 107, 0.05)', border: 'none', color: '#dfba6b', padding: '4px 10px', cursor: 'pointer', fontWeight: 'bold' }}>+</button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Drawer Footer Bill Structure (Visible only if items present) */}
+            {cartItems.length > 0 && (
+              <div style={{ padding: '1.5rem', backgroundColor: '#0c0917', borderTop: '1px solid rgba(223, 186, 107, 0.15)' }}>
+                <h5 style={{ margin: '0 0 1rem 0', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#a09ba2' }}>Bill Details</h5>
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px' }}>
+                  <span style={{ color: '#a09ba2' }}>Items Total</span>
+                  <span>₹{itemsTotalAmount}</span>
+                </div>
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px' }}>
+                  <span style={{ color: '#a09ba2' }}>Handling Charge</span>
+                  <span>₹{handlingCharge}</span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '1.25rem' }}>
+                  <span style={{ color: '#a09ba2' }}>Booking/Delivery Fee</span>
+                  <span>₹{deliveryFee}</span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: '600', paddingPadding: '1rem 0', borderTop: '1px dashed rgba(223, 186, 107, 0.2)', paddingTop: '1rem', marginBottom: '1.5rem' }}>
+                  <span style={{ color: '#dfba6b' }}>To Pay</span>
+                  <span style={{ color: '#dfba6b' }}>₹{grandTotal}</span>
+                </div>
+
+                {/* Primary Proceed Action button configured with layout colors */}
+                <button 
+                  onClick={() => {
+                    setIsCartOpen(false);
+                    if (setCurrentView) {
+                      setCurrentView({ page: 'checkout' });
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#dfba6b',
+                    color: '#0f0c1b',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '1rem',
+                    fontSize: '14px',
+                    fontWeight: '700',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    boxSizing: 'border-box',
+                    transition: 'opacity 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                >
+                  <span>Proceed to Checkout</span>
+                  <span>₹{grandTotal} ➔</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </>
       )}
     </nav>
   );

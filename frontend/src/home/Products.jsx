@@ -53,7 +53,27 @@ export default function Products({ cart = [], setCart, currentView = { page: 'li
   const handleAddToCart = (service, e) => {
     e.stopPropagation(); 
     if (setCart) {
-      setCart([...cart, service]);
+      const existingItem = cart.find((item) => item.id === service.id);
+      if (existingItem) {
+        setCart(
+          cart.map((item) =>
+            item.id === service.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          )
+        );
+      } else {
+        setCart([
+          ...cart,
+          {
+            id: service.id,
+            name: service.title,
+            price: service.price,
+            image: service.image,
+            quantity: 1
+          }
+        ]);
+      }
     }
   };
 
