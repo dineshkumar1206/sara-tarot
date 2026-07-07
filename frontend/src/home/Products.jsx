@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const SERVICES_DATA = [
   {
@@ -49,6 +50,7 @@ const SERVICES_DATA = [
 ];
 
 export default function Products({ cart = [], setCart }) {
+  const navigate = useNavigate();
   const [activeServiceId, setActiveServiceId] = React.useState(null);
 
   const handleAddToCart = (service, e) => {
@@ -199,6 +201,38 @@ export default function Products({ cart = [], setCart }) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* See More button */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '3.5rem' }}>
+          <button
+            onClick={() => navigate('/products/kali-pooja')}
+            style={{
+              backgroundColor: 'transparent',
+              color: '#dfba6b',
+              border: '1px solid rgba(223, 186, 107, 0.5)',
+              borderRadius: '2px',
+              padding: '0.9rem 2.2rem',
+              fontSize: '13px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '1.5px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(223, 186, 107, 0.1)';
+              e.currentTarget.style.borderColor = '#dfba6b';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.borderColor = 'rgba(223, 186, 107, 0.5)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            See More
+          </button>
         </div>
       </div>
 
