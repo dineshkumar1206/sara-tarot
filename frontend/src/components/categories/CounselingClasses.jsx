@@ -20,7 +20,7 @@ const POLICY_DATA = {
   ]
 };
 
-export default function CounselingClasses({ cart = [], setCart }) {
+export default function CounselingClasses({ cart = [], setCart, setIsCartOpen }) {
   const handleAddToCart = (item) => {
     if (!setCart) return;
 
@@ -45,6 +45,10 @@ export default function CounselingClasses({ cart = [], setCart }) {
           quantity: 1
         }
       ]);
+    }
+
+    if (setIsCartOpen) {
+      setIsCartOpen(true);
     }
   };
 

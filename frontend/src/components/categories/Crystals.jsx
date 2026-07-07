@@ -53,7 +53,7 @@ const POLICY_DATA = {
   ]
 };
 
-export default function Crystals({ cart = [], setCart }) {
+export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
   const handleAddToCart = (item) => {
     if (!setCart) return;
 
@@ -78,6 +78,10 @@ export default function Crystals({ cart = [], setCart }) {
           quantity: 1
         }
       ]);
+    }
+
+    if (setIsCartOpen) {
+      setIsCartOpen(true);
     }
   };
 

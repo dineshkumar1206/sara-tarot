@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 
-export default function Navbar({ cartItems = [], setCartItems }) {
+export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIsCartOpen }) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false); // Mobile menu toggle
-  const [isCartOpen, setIsCartOpen] = useState(false); // Cart drawer toggle
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Desktop dropdown toggle
   const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false); // Mobile sub-menu toggle
 

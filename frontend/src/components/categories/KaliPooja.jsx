@@ -54,7 +54,7 @@ const POLICY_DATA = {
   ]
 };
 
-export default function KaliPooja({ cart = [], setCart }) {
+export default function KaliPooja({ cart = [], setCart, setIsCartOpen }) {
   const handleAddToCart = (item) => {
     if (!setCart) return;
 
@@ -79,6 +79,10 @@ export default function KaliPooja({ cart = [], setCart }) {
           quantity: 1
         }
       ]);
+    }
+
+    if (setIsCartOpen) {
+      setIsCartOpen(true);
     }
   };
 

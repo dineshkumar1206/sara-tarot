@@ -49,7 +49,7 @@ const SERVICES_DATA = [
   }
 ];
 
-export default function Products({ cart = [], setCart }) {
+export default function Products({ cart = [], setCart, setIsCartOpen }) {
   const navigate = useNavigate();
   const [activeServiceId, setActiveServiceId] = React.useState(null);
 
@@ -77,6 +77,9 @@ export default function Products({ cart = [], setCart }) {
           }
         ]);
       }
+    }
+    if (setIsCartOpen) {
+      setIsCartOpen(true);
     }
   };
 

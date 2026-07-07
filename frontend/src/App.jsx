@@ -10,6 +10,7 @@ import ProductCategoryDetail from './pages/ProductCategoryDetail';
 
 export default function App() {
   const [cart, setCart] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const location = useLocation();
 
   // Scroll to top on path change
@@ -33,7 +34,12 @@ export default function App() {
 
   return (
     <div>
-      <Navbar cartItems={cart} setCartItems={setCart} />
+      <Navbar 
+        cartItems={cart} 
+        setCartItems={setCart} 
+        isCartOpen={isCartOpen} 
+        setIsCartOpen={setIsCartOpen} 
+      />
       <ScrollToTop />
       
       <Routes>
@@ -42,7 +48,11 @@ export default function App() {
           element={
             <>
               <Home />
-              <Products cart={cart} setCart={setCart} />
+              <Products 
+                cart={cart} 
+                setCart={setCart} 
+                setIsCartOpen={setIsCartOpen} 
+              />
             </>
           } 
         />
@@ -61,6 +71,7 @@ export default function App() {
             <ProductCategoryDetail 
               cart={cart} 
               setCart={setCart} 
+              setIsCartOpen={setIsCartOpen} 
             />
           } 
         />

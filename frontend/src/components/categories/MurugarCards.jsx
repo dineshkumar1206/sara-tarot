@@ -19,7 +19,7 @@ const POLICY_DATA = {
   ]
 };
 
-export default function MurugarCards({ cart = [], setCart }) {
+export default function MurugarCards({ cart = [], setCart, setIsCartOpen }) {
   const [expressChecked, setExpressChecked] = useState(false);
 
   const handleAddToCart = (item) => {
@@ -55,6 +55,10 @@ export default function MurugarCards({ cart = [], setCart }) {
           quantity: 1
         }
       ]);
+    }
+
+    if (setIsCartOpen) {
+      setIsCartOpen(true);
     }
   };
 

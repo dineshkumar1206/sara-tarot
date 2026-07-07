@@ -8,24 +8,24 @@ import TarotClasses from '../components/categories/TarotClasses';
 import CounselingClasses from '../components/categories/CounselingClasses';
 import KaliPooja from '../components/categories/KaliPooja';
 
-export default function ProductCategoryDetail({ cart = [], setCart }) {
+export default function ProductCategoryDetail({ cart = [], setCart, setIsCartOpen }) {
   const { category } = useParams();
 
   switch (category) {
     case 'tarot-consultation':
-      return <TarotConsultation cart={cart} setCart={setCart} />;
+      return <TarotConsultation cart={cart} setCart={setCart} setIsCartOpen={setIsCartOpen} />;
     case 'spiritual-healing':
-      return <SpiritualHealing cart={cart} setCart={setCart} />;
+      return <SpiritualHealing cart={cart} setCart={setCart} setIsCartOpen={setIsCartOpen} />;
     case 'crystals':
-      return <Crystals cart={cart} setCart={setCart} />;
+      return <Crystals cart={cart} setCart={setCart} setIsCartOpen={setIsCartOpen} />;
     case 'murugar-cards':
-      return <MurugarCards cart={cart} setCart={setCart} />;
+      return <MurugarCards cart={cart} setCart={setCart} setIsCartOpen={setIsCartOpen} />;
     case 'tarot-classes':
-      return <TarotClasses cart={cart} setCart={setCart} />;
+      return <TarotClasses cart={cart} setCart={setCart} setIsCartOpen={setIsCartOpen} />;
     case 'counseling-classes':
-      return <CounselingClasses cart={cart} setCart={setCart} />;
+      return <CounselingClasses cart={cart} setCart={setCart} setIsCartOpen={setIsCartOpen} />;
     case 'kali-pooja':
-      return <KaliPooja cart={cart} setCart={setCart} />;
+      return <KaliPooja cart={cart} setCart={setCart} setIsCartOpen={setIsCartOpen} />;
     default:
       return (
         <div style={{ backgroundColor: '#0f0c1b', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#f3f0ea', fontFamily: "'Inter', sans-serif" }}>
