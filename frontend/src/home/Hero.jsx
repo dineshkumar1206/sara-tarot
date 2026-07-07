@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion'; // Imported Framer Motion
 
 // ============================================================
@@ -236,6 +237,7 @@ function ZodiacWheel({ size = 620, gold = '#D9B56A', dim = '#9C8FB0' }) {
 }
 
 export default function Hero() {
+  const navigate = useNavigate();
   // Shared text animation variant configurations (Fade In Up)
   const fadeInUpVariants = {
     hidden: { opacity: 0, y: 40 },
@@ -450,6 +452,7 @@ export default function Hero() {
           {/* Call to action */}
           <button
             className="saraa-cta"
+            onClick={() => navigate('/products/spiritual-healing')}
             style={{
               position: 'absolute',
               bottom: 0,
