@@ -93,7 +93,7 @@ export default function Products({ cart = [], setCart, currentView = { page: 'li
   const currentService = SERVICES_DATA.find(s => s.id === currentView.serviceId);
 
   return (
-    <div style={{ backgroundColor: '#0f0c1b', minHeight: '100vh', color: '#f3f0ea', fontFamily: "'Inter', sans-serif", position: 'relative' }}>
+    <div id="products-section" style={{ backgroundColor: '#0f0c1b', minHeight: '100vh', color: '#f3f0ea', fontFamily: "'Inter', sans-serif", position: 'relative' }}>
       
       {/* --- SERVICE GRID PAGE --- */}
       <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '3rem 2rem' }}>

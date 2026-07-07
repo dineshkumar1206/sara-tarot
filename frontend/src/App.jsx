@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Products from './home/Products';
 import Home from './pages/Home';
 import Checkout from './components/Checkout';
+import Footer from './components/Footer';
 
 export default function App() {
   // Global Shared States passed into child configurations
@@ -29,6 +30,7 @@ export default function App() {
           />
         </>
       )}
+      <Footer setCurrentView={setCurrentView} />
     </div>
   );
 }

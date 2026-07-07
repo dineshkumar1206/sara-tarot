@@ -277,14 +277,19 @@ export default function Hero() {
         }
 
         @media (max-width: 900px) {
+          .saraa-content-row {
+            flex-direction: column-reverse !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+            padding-top: 6rem !important;
+            padding-bottom: 3rem !important;
+            gap: 3rem !important;
+          }
           .saraa-image-col {
             width: 100% !important;
+            max-width: 320px !important;
+            flex: 0 0 auto !important;
             margin-left: 0 !important; 
-          }
-          .saraa-content-row {
-            padding-top: 4rem !important;
-            padding-bottom: 3rem !important;
-            padding-right: 6vw !important;
           }
         }
       `}</style>

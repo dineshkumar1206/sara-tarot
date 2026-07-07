@@ -8,10 +8,10 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const itemsTotalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   
-  // Example arbitrary handling and delivery values to replicate the image layout
-  const handlingCharge = cartItems.length > 0 ? 4 : 0;
-  const deliveryFee = cartItems.length > 0 ? 29 : 0;
-  const grandTotal = itemsTotalAmount + handlingCharge + deliveryFee;
+  // Example arbitrary handling and delivery values to replicate the image layout (commented out per request)
+  const handlingCharge = 0;
+  const deliveryFee = 0;
+  const grandTotal = itemsTotalAmount;
 
   // Handler functions to sync quantities inside the cart drawer
   const updateQuantity = (id, delta) => {
@@ -417,6 +417,7 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
                   <span>₹{itemsTotalAmount}</span>
                 </div>
                 
+                {/* 
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px' }}>
                   <span style={{ color: '#a09ba2' }}>Handling Charge</span>
                   <span>₹{handlingCharge}</span>
@@ -426,6 +427,7 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
                   <span style={{ color: '#a09ba2' }}>Booking/Delivery Fee</span>
                   <span>₹{deliveryFee}</span>
                 </div>
+                */}
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: '600', paddingPadding: '1rem 0', borderTop: '1px dashed rgba(223, 186, 107, 0.2)', paddingTop: '1rem', marginBottom: '1.5rem' }}>
                   <span style={{ color: '#dfba6b' }}>To Pay</span>

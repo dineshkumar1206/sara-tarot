@@ -89,6 +89,14 @@ export default function AbtSara() {
           .pd-right-col-grid {
             grid-template-columns: 1fr 1fr !important;
           }
+          .pd-purchase-btn {
+            position: relative !important;
+            right: auto !important;
+            bottom: auto !important;
+            display: block !important;
+            margin: 3rem auto 0 auto !important;
+            width: fit-content !important;
+          }
         }
       `}</style>
 
