@@ -8,7 +8,7 @@ const ITEMS_DATA = [
     price: 1800,
     type: 'Blessed and Energized',
     desc: 'The ultimate stone for wealth, abundance, and business opportunities. Place it on your work desk or home locker.',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&h=400&q=80'
+    image: '/Golden-Pyrite-Cluster.png'
   },
   {
     id: 'crystal-amethyst',
@@ -16,7 +16,7 @@ const ITEMS_DATA = [
     price: 1500,
     type: 'Blessed and Energized',
     desc: 'Promotes deep calm, stress relief, and opens the third-eye chakra. Perfect for your home temple or meditation room.',
-    image: 'https://images.unsplash.com/photo-1569003339405-ea396a5a8a90?auto=format&fit=crop&w=400&h=400&q=80'
+    image: '/Raw-Amethyst-Geode.png'
   },
   {
     id: 'crystal-rose-quartz',
@@ -24,7 +24,7 @@ const ITEMS_DATA = [
     price: 1400,
     type: 'Blessed and Energized',
     desc: 'Emits gentle vibes of unconditional love, compassion, and emotional healing. Harmonizes relationship conflicts.',
-    image: 'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?auto=format&fit=crop&w=400&h=400&q=80'
+    image: '/Rose-Quartz-Love-Bowl-Tumbles.png'
   },
   {
     id: 'crystal-tourmaline',
@@ -32,7 +32,7 @@ const ITEMS_DATA = [
     price: 1600,
     type: 'Blessed and Energized',
     desc: 'The strongest grounding and protective stone. Deflects psychic attack, evil-eye, and absorbs electromagnetic haze.',
-    image: 'https://images.unsplash.com/photo-1515688594390-b649af70d282?auto=format&fit=crop&w=400&h=400&q=80'
+    image: '/Raw-Black-Tourmaline-Shield.png'
   },
   {
     id: 'crystal-clear-quartz',
@@ -40,7 +40,7 @@ const ITEMS_DATA = [
     price: 1200,
     type: 'Blessed and Energized',
     desc: 'The master healer. Amplifies the energy of other crystals and purifies the local environment of stagnant energy.',
-    image: 'https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?auto=format&fit=crop&w=400&h=400&q=80'
+    image: '/Clear-Quartz-Generator-Point.png'
   }
 ];
 

@@ -120,7 +120,7 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
                   gap: '6px'
                 }}
               >
-                Products
+                Spiritual Services
                 <svg width="8" height="5" viewBox="0 0 10 6" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M1 1l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -371,7 +371,7 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
                   textAlign: 'left'
                 }}
               >
-                <span>Products</span>
+                <span>Spiritual Services</span>
                 <svg 
                   width="10" 
                   height="6" 
