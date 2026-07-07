@@ -390,5 +390,8 @@ export default function Checkout({ cartItems = [], setCartItems, setCurrentView 
         </div>
       </div>
     </div>
-  );
+  ); 
 }
+
+
+//asdjasdc afc
