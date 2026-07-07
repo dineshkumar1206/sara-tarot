@@ -7,23 +7,11 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
   // Calculate totals
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const itemsTotalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  
-  // Example arbitrary handling and delivery values to replicate the image layout (commented out per request)
-  const handlingCharge = 0;
-  const deliveryFee = 0;
   const grandTotal = itemsTotalAmount;
 
-  // Handler functions to sync quantities inside the cart drawer
-  const updateQuantity = (id, delta) => {
-    const updated = cartItems
-      .map((item) => {
-        if (item.id === id) {
-          return { ...item, quantity: item.quantity + delta };
-        }
-        return item;
-      })
-      .filter((item) => item.quantity > 0); // Removes item if count reaches 0
-    setCartItems(updated);
+  // Direct removal function for the drawer items
+  const removeItem = (id) => {
+    setCartItems(cartItems.filter((item) => item.id !== id));
   };
 
   const clearCart = () => {
@@ -346,7 +334,7 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
               width: '100%',
               maxWidth: '420px',
               height: '100vh',
-              backgroundColor: '#130f24', // Themes match base
+              backgroundColor: '#130f24',
               borderLeft: '1px solid rgba(223, 186, 107, 0.2)',
               boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
               zIndex: 2001,
@@ -386,55 +374,59 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
                 </div>
               ) : (
                 cartItems.map((item) => (
-                  <div key={item.id} style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', paddingBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.05)', alignItems: 'center' }}>
-                    <img 
-                      src={item.image || "/placeholder-item.jpg"} 
-                      alt={item.name} 
-                      style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid rgba(223, 186, 107, 0.1)' }} 
-                    />
-                    <div style={{ flex: 1 }}>
-                      <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '500', color: '#f3f0ea' }}>{item.name}</h4>
-                      <p style={{ margin: 0, fontSize: '13px', color: '#dfba6b', fontWeight: '600' }}>₹{item.price}</p>
+                  <div key={item.id} style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', paddingBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <img 
+                        src={item.image || "/placeholder-item.jpg"} 
+                        alt={item.name} 
+                        style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid rgba(223, 186, 107, 0.1)' }} 
+                      />
+                      <div>
+                        <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '500', color: '#f3f0ea' }}>{item.name}</h4>
+                        <p style={{ margin: 0, fontSize: '13px', color: '#dfba6b', fontWeight: '600' }}>
+                          ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                        </p>
+                      </div>
                     </div>
-                    {/* Quantity Selector controls matched to layout logic */}
-                    <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(223, 186, 107, 0.3)', borderRadius: '4px', overflow: 'hidden' }}>
-                      <button onClick={() => updateQuantity(item.id, -1)} style={{ background: 'rgba(223, 186, 107, 0.05)', border: 'none', color: '#dfba6b', padding: '4px 10px', cursor: 'pointer', fontWeight: 'bold' }}>-</button>
-                      <span style={{ padding: '0 8px', fontSize: '13px', minWidth: '16px', textAlign: 'center' }}>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, 1)} style={{ background: 'rgba(223, 186, 107, 0.05)', border: 'none', color: '#dfba6b', padding: '4px 10px', cursor: 'pointer', fontWeight: 'bold' }}>+</button>
-                    </div>
+
+                    {/* Red Removal button instead of adjustment switches */}
+                    <button 
+                      onClick={() => removeItem(item.id)}
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: '#ef5353', 
+                        cursor: 'pointer', 
+                        fontSize: '16px', 
+                        padding: '4px', 
+                        display: 'flex', 
+                        alignItems: 'center' 
+                      }}
+                      title="Remove item"
+                    >
+                      ✕
+                    </button>
                   </div>
                 ))
               )}
             </div>
 
-            {/* Drawer Footer Bill Structure (Visible only if items present) */}
+            {/* Drawer Footer Bill Structure */}
             {cartItems.length > 0 && (
               <div style={{ padding: '1.5rem', backgroundColor: '#0c0917', borderTop: '1px solid rgba(223, 186, 107, 0.15)' }}>
                 <h5 style={{ margin: '0 0 1rem 0', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#a09ba2' }}>Bill Details</h5>
                 
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '1rem' }}>
                   <span style={{ color: '#a09ba2' }}>Items Total</span>
-                  <span>₹{itemsTotalAmount}</span>
-                </div>
-                
-                {/* 
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px' }}>
-                  <span style={{ color: '#a09ba2' }}>Handling Charge</span>
-                  <span>₹{handlingCharge}</span>
+                  <span>₹{itemsTotalAmount.toLocaleString('en-IN')}</span>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '1.25rem' }}>
-                  <span style={{ color: '#a09ba2' }}>Booking/Delivery Fee</span>
-                  <span>₹{deliveryFee}</span>
-                </div>
-                */}
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: '600', paddingPadding: '1rem 0', borderTop: '1px dashed rgba(223, 186, 107, 0.2)', paddingTop: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: '600', borderTop: '1px dashed rgba(223, 186, 107, 0.2)', paddingTop: '1rem', marginBottom: '1.5rem' }}>
                   <span style={{ color: '#dfba6b' }}>To Pay</span>
-                  <span style={{ color: '#dfba6b' }}>₹{grandTotal}</span>
+                  <span style={{ color: '#dfba6b' }}>₹{grandTotal.toLocaleString('en-IN')}</span>
                 </div>
 
-                {/* Primary Proceed Action button configured with layout colors */}
+                {/* Primary Proceed Action button */}
                 <button 
                   onClick={() => {
                     setIsCartOpen(false);
@@ -464,7 +456,7 @@ export default function Navbar({ cartItems = [], setCartItems, setCurrentView })
                   onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                 >
                   <span>Proceed to Checkout</span>
-                  <span>₹{grandTotal} ➔</span>
+                  <span>₹{grandTotal.toLocaleString('en-IN')} ➔</span>
                 </button>
               </div>
             )}

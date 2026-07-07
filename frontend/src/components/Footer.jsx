@@ -67,15 +67,15 @@ export default function Footer({ setCurrentView }) {
         {/* TOP ROW: 3 Columns Grid */}
         <div className="footer-cols" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.6fr 1.2fr', gap: '3rem', marginBottom: '4rem' }}>
           
-          {/* Column 1: Address */}
+          {/* Column 1: Updated Address */}
           <div>
             <h4 style={{ color: '#dfba6b', fontSize: '15px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600', marginBottom: '1.5rem', borderBottom: '1px solid rgba(223, 186, 107, 0.1)', paddingBottom: '8px' }}>
               Address
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '14px', color: 'rgba(243, 240, 234, 0.75)', lineHeight: '2' }}>
-              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>Address:</span> 1080 Brickell Ave</li>
-              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>City:</span> Miami ( Florida )</li>
-              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>Country:</span> United States</li>
+              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>Address:</span> No. 45, Burkit Road, T. Nagar</li>
+              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>City:</span> Chennai ( Tamil Nadu )</li>
+              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>Country:</span> India</li>
             </ul>
             
             {/* Payment Icons */}
@@ -89,7 +89,6 @@ export default function Footer({ setCurrentView }) {
 
           {/* Column 2: Logo and Bio */}
           <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            {/* Elegant Brand Logo */}
             <div 
               style={{ 
                 fontFamily: "'Playfair Display', serif", 
@@ -101,7 +100,7 @@ export default function Footer({ setCurrentView }) {
                 marginBottom: '1rem'
               }}
             >
-              Saraa Taroti
+              Saraa Tarot
             </div>
             
             <p style={{ fontSize: '13px', lineHeight: '1.7', color: 'rgba(243, 240, 234, 0.7)', maxWidth: '440px', margin: '0 auto 2rem auto' }}>
@@ -110,19 +109,16 @@ export default function Footer({ setCurrentView }) {
 
             {/* Social Media Links */}
             <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
-              {/* Facebook */}
               <a href="#facebook" style={{ color: '#dfba6b', opacity: 0.8, transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}>
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1V12h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/>
                 </svg>
               </a>
-              {/* Twitter */}
               <a href="#twitter" style={{ color: '#dfba6b', opacity: 0.8, transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}>
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
                 </svg>
               </a>
-              {/* YouTube */}
               <a href="#youtube" style={{ color: '#dfba6b', opacity: 0.8, transition: 'opacity 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}>
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M23.498 6.163a3.003 3.003 0 00-2.11-2.107C19.52 3.5 12 3.5 12 3.5s-7.52 0-9.388.556a3.002 3.002 0 00-2.11 2.107C0 8.029 0 12 0 12s0 3.971.502 5.837a3.003 3.003 0 002.11 2.107C4.48 20.5 12 20.5 12 20.5s7.52 0 9.388-.556a3.002 3.002 0 002.11-2.107C24 15.971 24 12 24 12s0-3.971-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -131,15 +127,15 @@ export default function Footer({ setCurrentView }) {
             </div>
           </div>
 
-          {/* Column 3: Contact Info */}
+          {/* Column 3: Updated Chennai Contact Info */}
           <div>
             <h4 style={{ color: '#dfba6b', fontSize: '15px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600', marginBottom: '1.5rem', borderBottom: '1px solid rgba(223, 186, 107, 0.1)', paddingBottom: '8px' }}>
               Info
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '14px', color: 'rgba(243, 240, 234, 0.75)', lineHeight: '2' }}>
-              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>Support:</span> info@astrology.com</li>
-              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>Email:</span> info@tarotcards.com</li>
-              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>Phone:</span> +1 385 386 309</li>
+              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>Support:</span> support@saraatarot.in</li>
+              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>Email:</span> contact@saraatarot.in</li>
+              <li style={{ marginBottom: '8px' }}><span style={{ color: '#dfba6b', fontWeight: '500' }}>Phone:</span> +91 98400 12345</li>
             </ul>
           </div>
 
@@ -158,7 +154,6 @@ export default function Footer({ setCurrentView }) {
             gap: '1.5rem'
           }}
         >
-          {/* Services Links list */}
           <div 
             style={{
               display: 'flex',
@@ -176,7 +171,6 @@ export default function Footer({ setCurrentView }) {
             <span>Mineralotherapy</span>
           </div>
 
-          {/* Book / Purchase Button */}
           <button
             onClick={() => {
               if (setCurrentView) {
@@ -222,7 +216,6 @@ export default function Footer({ setCurrentView }) {
 
       </div>
 
-      {/* Responsive media queries injected directly via CSS rule */}
       <style>{`
         @media (max-width: 900px) {
           .footer-cols {

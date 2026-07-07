@@ -301,7 +301,7 @@ export default function Hero() {
           left: '-190px',
           top: '50%',
           transform: 'translateY(-50%)',
-          opacity: 0.55,
+          opacity: 0.30,
           pointerEvents: 'none',
           zIndex: 1,
         }}
@@ -390,7 +390,7 @@ export default function Hero() {
           <motion.div
             variants={fadeInUpVariants}
             style={{
-              color: COLORS.ink200,
+              color: 'rgba(244, 240, 234, 0.85)',
               fontFamily: "'Poppins', sans-serif",
               fontWeight: 300,
               fontSize: '16px',

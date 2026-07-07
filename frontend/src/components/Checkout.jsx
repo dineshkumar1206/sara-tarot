@@ -6,9 +6,7 @@ const MERCHANT_UPI_ID = '50100234981123@hdfcbank'; // HDFC current account UPI I
 const MERCHANT_NAME = 'SARAA TAROT SERVICES';
 
 export default function Checkout({ cartItems = [], setCartItems, setCurrentView }) {
-  const [paymentMethod, setPaymentMethod] = useState('upi'); // 'upi', 'card', 'qr'
-  const [cardDetails, setCardDetails] = useState({ number: '', name: '', expiry: '', cvv: '' });
-  const [upiId, setUpiId] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('qr'); // Only 'qr' is active per request
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   
@@ -18,12 +16,17 @@ export default function Checkout({ cartItems = [], setCartItems, setCurrentView 
   const itemsTotalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const grandTotal = itemsTotalAmount;
 
+  const removeItem = (id) => {
+    setCartItems(cartItems.filter((item) => item.id !== id));
+  };
+
   // Generate the dynamic UPI URL and QR Code image link
   const upiLink = `upi://pay?pa=${MERCHANT_UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${grandTotal}&cu=INR`;
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`;
 
   const handlePay = (e) => {
     e.preventDefault();
+    if (cartItems.length === 0) return;
     setIsProcessing(true);
     
     // Save snapshot of order before clearing cart
@@ -208,36 +211,16 @@ export default function Checkout({ cartItems = [], setCartItems, setCurrentView 
               Select Payment Method
             </h3>
 
-            {/* Selector Buttons */}
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-              <button 
-                type="button"
-                onClick={() => setPaymentMethod('upi')}
-                style={{
-                  flex: '1 1 100px',
-                  padding: '0.8rem 0.5rem',
-                  backgroundColor: paymentMethod === 'upi' ? 'rgba(223, 186, 107, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-                  color: paymentMethod === 'upi' ? '#dfba6b' : '#a09ba2',
-                  border: paymentMethod === 'upi' ? '1px solid #dfba6b' : '1px solid rgba(223, 186, 107, 0.15)',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                  fontWeight: '600',
-                  fontSize: '12px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}
-              >
-                UPI ID
-              </button>
               <button 
                 type="button"
                 onClick={() => setPaymentMethod('qr')}
                 style={{
                   flex: '1 1 100px',
                   padding: '0.8rem 0.5rem',
-                  backgroundColor: paymentMethod === 'qr' ? 'rgba(223, 186, 107, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-                  color: paymentMethod === 'qr' ? '#dfba6b' : '#a09ba2',
-                  border: paymentMethod === 'qr' ? '1px solid #dfba6b' : '1px solid rgba(223, 186, 107, 0.15)',
+                  backgroundColor: 'rgba(223, 186, 107, 0.15)',
+                  color: '#dfba6b',
+                  border: '1px solid #dfba6b',
                   cursor: 'pointer',
                   borderRadius: '4px',
                   fontWeight: '600',
@@ -248,59 +231,9 @@ export default function Checkout({ cartItems = [], setCartItems, setCurrentView 
               >
                 QR Code
               </button>
-              <button 
-                type="button"
-                onClick={() => setPaymentMethod('card')}
-                style={{
-                  flex: '1 1 100px',
-                  padding: '0.8rem 0.5rem',
-                  backgroundColor: paymentMethod === 'card' ? 'rgba(223, 186, 107, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-                  color: paymentMethod === 'card' ? '#dfba6b' : '#a09ba2',
-                  border: paymentMethod === 'card' ? '1px solid #dfba6b' : '1px solid rgba(223, 186, 107, 0.15)',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                  fontWeight: '600',
-                  fontSize: '12px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}
-              >
-                Card
-              </button>
             </div>
 
             <form onSubmit={handlePay}>
-              {/* UPI Form */}
-              {paymentMethod === 'upi' && (
-                <div>
-                  <label style={{ display: 'block', fontSize: '13px', color: '#a09ba2', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Enter Virtual Payment Address (VPA) / UPI ID
-                  </label>
-                  <input 
-                    type="text" 
-                    required 
-                    placeholder="e.g. username@upi" 
-                    value={upiId}
-                    onChange={(e) => setUpiId(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.9rem 1rem',
-                      backgroundColor: '#0c0917',
-                      border: '1px solid rgba(223, 186, 107, 0.25)',
-                      borderRadius: '4px',
-                      color: '#f3f0ea',
-                      fontSize: '14px',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                      marginBottom: '2rem'
-                    }}
-                  />
-                  <p style={{ fontSize: '12px', color: 'rgba(243, 240, 234, 0.5)', lineHeight: '1.5', marginTop: '-1rem', marginBottom: '2rem' }}>
-                    We support Google Pay, PhonePe, Paytm, BHIM UPI, and all major bank UPI apps.
-                  </p>
-                </div>
-              )}
-
               {/* QR Code Screen */}
               {paymentMethod === 'qr' && (
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -322,11 +255,15 @@ export default function Checkout({ cartItems = [], setCartItems, setCurrentView 
                       boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                     }}
                   >
-                    <img 
-                      src={qrImageUrl} 
-                      alt="Payment QR Code" 
-                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                    />
+                    {cartItems.length > 0 ? (
+                      <img 
+                        src={qrImageUrl} 
+                        alt="Payment QR Code" 
+                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                      />
+                    ) : (
+                      <div style={{ color: '#0f0c1b', fontSize: '12px', fontWeight: '600' }}>No active balance</div>
+                    )}
                   </div>
                   <div style={{ color: '#dfba6b', fontWeight: '600', fontSize: '15px' }}>
                     Pay to: {MERCHANT_NAME}
@@ -334,120 +271,6 @@ export default function Checkout({ cartItems = [], setCartItems, setCurrentView 
                   <p style={{ fontSize: '11px', color: 'rgba(243, 240, 234, 0.5)', marginTop: '8px' }}>
                     Your payment will settle directly into our linked bank account.
                   </p>
-                </div>
-              )}
-
-              {/* Card Form */}
-              {paymentMethod === 'card' && (
-                <div>
-                  <div style={{ marginBottom: '1.25rem' }}>
-                    <label style={{ display: 'block', fontSize: '12px', color: '#a09ba2', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Cardholder Name
-                    </label>
-                    <input 
-                      type="text" 
-                      required={paymentMethod === 'card'}
-                      placeholder="Full Name as on Card" 
-                      value={cardDetails.name}
-                      onChange={(e) => setCardDetails({ ...cardDetails, name: e.target.value })}
-                      style={{
-                        width: '100%',
-                        padding: '0.8rem 1rem',
-                        backgroundColor: '#0c0917',
-                        border: '1px solid rgba(223, 186, 107, 0.25)',
-                        borderRadius: '4px',
-                        color: '#f3f0ea',
-                        fontSize: '14px',
-                        outline: 'none',
-                        boxSizing: 'border-box'
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ marginBottom: '1.25rem' }}>
-                    <label style={{ display: 'block', fontSize: '12px', color: '#a09ba2', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Card Number
-                    </label>
-                    <input 
-                      type="text" 
-                      maxLength="19"
-                      required={paymentMethod === 'card'}
-                      placeholder="0000 0000 0000 0000" 
-                      value={cardDetails.number}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
-                        setCardDetails({ ...cardDetails, number: val });
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '0.8rem 1rem',
-                        backgroundColor: '#0c0917',
-                        border: '1px solid rgba(223, 186, 107, 0.25)',
-                        borderRadius: '4px',
-                        color: '#f3f0ea',
-                        fontSize: '14px',
-                        outline: 'none',
-                        boxSizing: 'border-box'
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-                    <div style={{ flex: 1 }}>
-                      <label style={{ display: 'block', fontSize: '12px', color: '#a09ba2', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        Expiry Date
-                      </label>
-                      <input 
-                        type="text" 
-                        maxLength="5"
-                        required={paymentMethod === 'card'}
-                        placeholder="MM/YY" 
-                        value={cardDetails.expiry}
-                        onChange={(e) => {
-                          let val = e.target.value.replace(/\D/g, '');
-                          if (val.length > 2) {
-                            val = val.substring(0, 2) + '/' + val.substring(2, 4);
-                          }
-                          setCardDetails({ ...cardDetails, expiry: val });
-                        }}
-                        style={{
-                          width: '100%',
-                          padding: '0.8rem 1rem',
-                          backgroundColor: '#0c0917',
-                          border: '1px solid rgba(223, 186, 107, 0.25)',
-                          borderRadius: '4px',
-                          color: '#f3f0ea',
-                          fontSize: '14px',
-                          outline: 'none',
-                          boxSizing: 'border-box'
-                        }}
-                      />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <label style={{ display: 'block', fontSize: '12px', color: '#a09ba2', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        CVV / CVC
-                      </label>
-                      <input 
-                        type="password" 
-                        maxLength="4"
-                        required={paymentMethod === 'card'}
-                        placeholder="•••" 
-                        value={cardDetails.cvv}
-                        onChange={(e) => setCardDetails({ ...cardDetails, cvv: e.target.value.replace(/\D/g, '') })}
-                        style={{
-                          width: '100%',
-                          padding: '0.8rem 1rem',
-                          backgroundColor: '#0c0917',
-                          border: '1px solid rgba(223, 186, 107, 0.25)',
-                          borderRadius: '4px',
-                          color: '#f3f0ea',
-                          fontSize: '14px',
-                          outline: 'none',
-                          boxSizing: 'border-box'
-                        }}
-                      />
-                    </div>
-                  </div>
                 </div>
               )}
 
@@ -483,14 +306,12 @@ export default function Checkout({ cartItems = [], setCartItems, setCurrentView 
               >
                 {isProcessing 
                   ? 'Processing...' 
-                  : paymentMethod === 'qr' 
-                    ? `I Have Paid ₹${grandTotal.toLocaleString('en-IN')}` 
-                    : `Pay ₹${grandTotal.toLocaleString('en-IN')}`}
+                  : `I Have Paid ₹${grandTotal.toLocaleString('en-IN')}`}
               </button>
             </form>
           </div>
 
-          {/* RIGHT COLUMN: Order Summary */}
+          {/* RIGHT COLUMN: Updated Order Summary without Increment/Decrement controls */}
           <div 
             style={{
               backgroundColor: '#130f24',
@@ -504,27 +325,37 @@ export default function Checkout({ cartItems = [], setCartItems, setCurrentView 
               Order Summary
             </h3>
 
-            {/* Cart Items List */}
-            <div style={{ maxHeight: '240px', overflowY: 'auto', marginBottom: '1.5rem' }}>
+            {/* Cart Items Interactive List */}
+            <div style={{ maxHeight: '320px', overflowY: 'auto', marginBottom: '1.5rem', paddingRight: '4px' }}>
               {cartItems.length === 0 ? (
-                <p style={{ color: '#a09ba2', fontSize: '14px' }}>No items in checkout.</p>
+                <p style={{ color: '#a09ba2', fontSize: '14px', textAlign: 'center', padding: '2rem 0' }}>No items in checkout.</p>
               ) : (
                 cartItems.map((item) => (
-                  <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '1rem' }}>
+                  <div key={item.id} style={{ display: 'flex', gap: '1rem', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '1.25rem' }}>
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                       <img 
-                        src={item.image} 
+                        src={item.image || "/placeholder-item.jpg"} 
                         alt={item.name} 
-                        style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '4px', border: '1px solid rgba(223, 186, 107, 0.1)' }} 
+                        style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px', border: '1px solid rgba(223, 186, 107, 0.1)' }} 
                       />
+                      
                       <div>
-                        <h4 style={{ margin: '0 0 2px 0', fontSize: '13px', fontWeight: '500', color: '#f3f0ea' }}>{item.name}</h4>
-                        <p style={{ margin: 0, fontSize: '12px', color: '#a09ba2' }}>Qty: {item.quantity}</p>
+                        <h4 style={{ margin: '0 0 4px 0', fontSize: '13px', fontWeight: '500', color: '#f3f0ea' }}>{item.name}</h4>
+                        <p style={{ margin: 0, fontSize: '13px', color: '#dfba6b', fontWeight: '600' }}>
+                          ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                        </p>
                       </div>
                     </div>
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#dfba6b' }}>
-                      ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                    </span>
+
+                    {/* Left alone with explicit trash target handler invocation */}
+                    <button 
+                      type="button" 
+                      onClick={() => removeItem(item.id)}
+                      style={{ background: 'none', border: 'none', color: '#ef5353', cursor: 'pointer', fontSize: '16px', padding: '4px', display: 'flex', alignItems: 'center' }}
+                      title="Remove item"
+                    >
+                      ✕
+                    </button>
                   </div>
                 ))
               )}
@@ -533,23 +364,11 @@ export default function Checkout({ cartItems = [], setCartItems, setCurrentView 
             {/* Bill Details */}
             {cartItems.length > 0 && (
               <div style={{ borderTop: '1px solid rgba(223, 186, 107, 0.15)', paddingTop: '1.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '12px' }}>
                   <span style={{ color: '#a09ba2' }}>Items Total</span>
-                  <span>₹{itemsTotalAmount.toLocaleString('en-IN')}</span>
+                  <span style={{ color: '#f3f0ea' }}>₹{itemsTotalAmount.toLocaleString('en-IN')}</span>
                 </div>
                 
-                {/* 
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px' }}>
-                  <span style={{ color: '#a09ba2' }}>Handling Charge</span>
-                  <span>₹{handlingCharge}</span>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '1.25rem' }}>
-                  <span style={{ color: '#a09ba2' }}>Booking/Delivery Fee</span>
-                  <span>₹{deliveryFee}</span>
-                </div>
-                */}
-
                 <div 
                   style={{ 
                     display: 'flex', 
