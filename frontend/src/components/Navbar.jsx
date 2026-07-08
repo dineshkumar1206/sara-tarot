@@ -187,7 +187,7 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
 
             <li>
               <Link 
-                to="/#about" 
+                to="/about" 
                 style={{ color: '#f3f0ea', textDecoration: 'none', transition: 'color 0.3s ease' }}
                 onMouseEnter={(e) => e.currentTarget.style.color = '#dfba6b'}
                 onMouseLeave={(e) => e.currentTarget.style.color = '#f3f0ea'}
@@ -198,7 +198,7 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
 
             <li>
               <Link 
-                to="/#contact" 
+                to="/contact" 
                 style={{ color: '#f3f0ea', textDecoration: 'none', transition: 'color 0.3s ease' }}
                 onMouseEnter={(e) => e.currentTarget.style.color = '#dfba6b'}
                 onMouseLeave={(e) => e.currentTarget.style.color = '#f3f0ea'}
@@ -436,7 +436,7 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
 
             <li>
               <Link 
-                to="/#about"
+                to="/about"
                 onClick={() => setIsOpen(false)}
                 style={{
                   color: '#f3f0ea',
@@ -454,7 +454,7 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
 
             <li>
               <Link 
-                to="/#contact"
+                to="/contact"
                 onClick={() => setIsOpen(false)}
                 style={{
                   color: '#f3f0ea',

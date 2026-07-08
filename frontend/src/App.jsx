@@ -7,6 +7,8 @@ import Checkout from './components/Checkout';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import ProductCategoryDetail from './pages/ProductCategoryDetail';
+import About from './pages/About/About';
+import Contact from './pages/Contact';
 
 export default function App() {
   const [cart, setCart] = useState([]);
@@ -75,6 +77,8 @@ export default function App() {
             />
           } 
         />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
       
       <Footer />

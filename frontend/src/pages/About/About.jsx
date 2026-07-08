@@ -1,0 +1,111 @@
+import React from 'react';
+import CosmicInsights from './CosmicInsights';
+import Team from './Team';
+
+// High-quality relevant founder photography for the right-hand container
+const aboutImage = "/about.png";
+
+export default function About() {
+  return (
+    <>
+      {/* Required for the fonts to load if not already in your index.html */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Poppins:wght@300;400;500;600&display=swap');
+      `}</style>
+
+      <section className="bg-[#120B1F] text-[#F4F0EA] py-24 w-full flex items-center relative overflow-hidden box-border">
+        
+        <div className="w-full max-w-[1320px] mx-auto flex flex-wrap items-center gap-[4.5rem] px-[6vw]">
+          
+          {/* Left Column Container: Branding copy, sub-features grid, button */}
+          <div className="w-full lg:flex-1 lg:basis-[540px] lg:max-w-[620px]">
+            
+            {/* Small upper serif label */}
+            <p className="m-0 mb-3 font-['Playfair_Display'] italic text-[18px] text-[#D9B56A]">
+              Meet the Visionary Behind Saraa Tarot
+            </p>
+
+            {/* Main Title Header */}
+            <h2 className="m-0 mb-6 font-['Playfair_Display'] text-[clamp(32px,4.5vw,48px)] font-normal leading-[1.2] text-[#F4F0EA]">
+              Guiding Your Spirit Toward Absolute Clarity
+            </h2>
+
+            {/* Description Copy */}
+            <p className="m-0 mb-12 font-['Poppins'] font-light text-[15px] leading-[1.75] text-[#B7AFC7]">
+              My journey into the esoteric arts began as a profound personal calling. I founded Saraa Tarot with a singular purpose: to bridge the gap between the material world and universal wisdom. By drawing on decades of intuitive practice, I am dedicated to helping you decode life's complexities and step confidently into your true alignment.
+            </p>
+
+            {/* Side-by-side Mini Insights Modules Grid */}
+            <div className="flex flex-wrap gap-10 w-full">
+              
+              {/* Feature Item 1 */}
+              <div className="flex-1 basis-[240px]">
+                {/* Detailed Astrology Line Art Icon */}
+                <div className="w-[70px] h-[70px] mb-5">
+                  <svg viewBox="0 0 100 100" fill="none" className="stroke-[#D9B56A] stroke-1">
+                    <circle cx="50" cy="50" r="45" strokeDasharray="2 2" />
+                    <circle cx="50" cy="50" r="35" />
+                    <path d="M50 5 L50 95 M5 50 L95 50" className="stroke-[0.5] opacity-50" />
+                    {/* Ram Horn symbol shape representation */}
+                    <path d="M42 46 C42 40 46 38 50 44 C54 38 58 40 58 46 C58 52 50 62 50 62" className="stroke-[1.5]" />
+                    <circle cx="50" cy="24" r="2" className="fill-[#D9B56A] border-none" />
+                    <circle cx="50" cy="76" r="2" className="fill-[#D9B56A] border-none" />
+                  </svg>
+                </div>
+                <h4 className="m-0 mb-2 font-['Playfair_Display'] text-[20px] font-normal">
+                  Intuitive Mastery
+                </h4>
+                <p className="m-0 font-['Poppins'] font-light text-[14px] leading-[1.6] text-[#B7AFC7]">
+                  Harnessing deep empathic abilities to read the energies shaping your current path.
+                </p>
+              </div>
+
+              {/* Feature Item 2 */}
+              <div className="flex-1 basis-[240px]">
+                {/* Detailed Scorpion Astrology Line Art Icon */}
+                <div className="w-[70px] h-[70px] mb-5">
+                  <svg viewBox="0 0 100 100" fill="none" className="stroke-[#D9B56A] stroke-1">
+                    <circle cx="50" cy="50" r="45" />
+                    <circle cx="50" cy="50" r="38" strokeDasharray="3 1" className="opacity-60" />
+                    {/* Scorpio Glyph representation shape */}
+                    <path d="M40 42 V58 M40 45 C40 38 46 38 46 45 V58 M46 45 C46 38 52 38 52 45 V58 C52 62 56 62 58 56 L62 60 M58 56 L54 54" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <h4 className="m-0 mb-2 font-['Playfair_Display'] text-[20px] font-normal">
+                  Empathetic Healing
+                </h4>
+                <p className="m-0 font-['Poppins'] font-light text-[14px] leading-[1.6] text-[#B7AFC7]">
+                  Creating a safe space for vulnerability, transformation, and profound emotional release.
+                </p>
+              </div>
+
+            </div>
+
+            {/* Action button */}
+            <button className="bg-transparent text-[#D9B56A] border border-dashed border-[#D9B56A]/40 py-4 px-8 font-['Poppins'] text-[13px] font-medium uppercase tracking-[1.5px] cursor-pointer transition-all duration-300 mt-8 hover:border-solid hover:border-[#D9B56A] hover:bg-[#D9B56A]/5">
+              Connect With Me
+            </button>
+
+          </div>
+
+          {/* Right Column Container: Asymmetric visual presentation layout window */}
+          <div className="w-full lg:flex-1 lg:basis-[420px] lg:max-w-[560px] flex justify-center lg:justify-end relative mt-12 lg:mt-0">
+            
+            <div className="w-full aspect-[4/3.8] rounded-bl-[180px] overflow-hidden border border-[#D9B56A]/20 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] relative">
+              <img 
+                src={aboutImage} 
+                alt="Founder of Saraa Tarot" 
+                className="w-full h-full object-cover block"
+              />
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+      
+      <CosmicInsights />
+      <Team />
+    </>
+  );
+}
