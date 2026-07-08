@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../../config';
 
 const CRYSTAL_CATEGORIES = [
   {
@@ -58,7 +59,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
   useEffect(() => {
     const fetchCrystals = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/products');
+        const res = await axios.get(`${API_BASE_URL}/api/products`);
         setItems(res.data);
       } catch (err) {
         console.error('Failed to load crystals from database. Using fallback seed data.', err);

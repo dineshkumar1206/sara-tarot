@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { loginSuccess } from '../store/slices/authSlice';
+import { API_BASE_URL } from '../config';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -21,7 +22,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         email,
         password
       });

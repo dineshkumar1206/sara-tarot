@@ -7,6 +7,7 @@ import {
   Loader2, AlertCircle, CheckCircle, Gem
 } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
+import { API_BASE_URL } from '../config';
 
 const CATEGORIES = ['Rashi', 'Dhanyog', 'Bracelet', 'Karungali', 'Rudraksh', 'Yantra', 'Pyrite'];
 
@@ -57,7 +58,7 @@ export default function Dashboard() {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get('http://localhost:5000/api/products');
+      const res = await axios.get(`${API_BASE_URL}/api/products`);
       setProducts(res.data);
     } catch (err) {
       console.error(err);
@@ -109,7 +110,7 @@ export default function Dashboard() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this crystal?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProducts(products.filter(p => p.id !== id));
@@ -153,7 +154,7 @@ export default function Dashboard() {
     try {
       if (formData.id) {
         // Edit mode
-        const res = await axios.put(`http://localhost:5000/api/products/${formData.id}`, fd, {
+        const res = await axios.put(`${API_BASE_URL}/api/products/${formData.id}`, fd, {
           headers: { 
             Authorization: `Bearer ${token}`
           }
@@ -162,7 +163,7 @@ export default function Dashboard() {
         setFormSuccess('Crystal updated successfully!');
       } else {
         // Add mode
-        const res = await axios.post('http://localhost:5000/api/products', fd, {
+        const res = await axios.post(`${API_BASE_URL}/api/products`, fd, {
           headers: { 
             Authorization: `Bearer ${token}`
           }

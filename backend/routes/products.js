@@ -170,6 +170,9 @@ router.get('/', async (req, res) => {
 // @route   POST api/products
 // @desc    Create a new product (admin only)
 router.post('/', verifyAdmin, upload.single('image'), async (req, res) => {
+  console.log('--- POST /api/products request received ---');
+  console.log('req.body:', req.body);
+  console.log('req.file:', req.file);
   const { name, price, type, category, desc, image, inclusions } = req.body;
 
   if (!name || !price || !category) {
@@ -218,6 +221,9 @@ router.post('/', verifyAdmin, upload.single('image'), async (req, res) => {
 // @route   PUT api/products/:id
 // @desc    Update a product (admin only)
 router.put('/:id', verifyAdmin, upload.single('image'), async (req, res) => {
+  console.log('--- PUT /api/products/:id request received ---');
+  console.log('req.body:', req.body);
+  console.log('req.file:', req.file);
   const { name, price, type, category, desc, image, inclusions } = req.body;
 
   try {
