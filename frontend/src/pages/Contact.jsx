@@ -60,7 +60,7 @@ export default function Contact() {
             </h2>
 
             {/* Accordion / Services List */}
-            <div className="mb-6">
+            <div className="mb-10">
               {accordionItems.map((item, index) => (
                 <div key={index} className="flex items-center py-5 border-b border-[#D9B56A]/20 font-sans text-[15px] text-[#F4F0EA] cursor-pointer transition-colors duration-300 hover:text-[#D9B56A]">
                   <span className="mr-4 text-[#D9B56A] text-[12px]">▼</span>
@@ -69,7 +69,26 @@ export default function Contact() {
               ))}
             </div>
 
-            <button className="bg-transparent text-[#D9B56A] border border-[#D9B56A] px-8 py-3 font-sans text-[12px] font-medium uppercase tracking-[1.5px] cursor-pointer transition-all duration-300 mt-8 inline-block hover:bg-[#D9B56A] hover:text-[#120B1F]">
+            {/* Contact Information Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10 text-[#F4F0EA] font-sans">
+              <div>
+                <h4 className="text-[#D9B56A] text-[15px] font-semibold uppercase tracking-[1.5px] mb-3">Office Address</h4>
+                <p className="text-[#B7AFC7] text-[14px] leading-relaxed m-0 font-light">
+                  SARA HEALING CENTRE<br />
+                  Shri sathya nagar, Othivakkam,<br />
+                  Guduvanchery, Chengalpattu
+                </p>
+              </div>
+              <div>
+                <h4 className="text-[#D9B56A] text-[15px] font-semibold uppercase tracking-[1.5px] mb-3">Get in Touch</h4>
+                <p className="text-[#B7AFC7] text-[14px] leading-relaxed m-0 font-light">
+                  <span className="font-semibold text-[#D9B56A]">Phone:</span> +91 96551 99507<br />
+                  <span className="font-semibold text-[#D9B56A]">Email:</span> tamiltarotmagic@gmail.com
+                </p>
+              </div>
+            </div>
+
+            <button className="bg-transparent text-[#D9B56A] border border-[#D9B56A] px-8 py-3 font-sans text-[12px] font-medium uppercase tracking-[1.5px] cursor-pointer transition-all duration-300 inline-block hover:bg-[#D9B56A] hover:text-[#120B1F]">
               Ask for a Quote
             </button>
 
@@ -90,13 +109,13 @@ export default function Contact() {
           <div className="flex-1 w-full lg:min-w-[500px] min-h-[400px] md:min-h-[450px] relative z-10">
             <div className="w-full h-full min-h-[400px] md:min-h-[450px] bg-[#0A0713] border border-[#D9B56A]/20 grayscale-[80%] invert-[90%] hue-rotate-180 contrast-85">
               
-              {/* Google Maps iFrame for T. Nagar, Chennai */}
+              {/* Google Maps iFrame for Guduvanchery */}
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31093.41113063556!2d80.21855661073847!3d13.041797825310614!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a526655a538234d%3A0x89bdad035cbabce3!2sT.%20Nagar%2C%20Chennai%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1708450123456!5m2!1sen!2sin" 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3890.871032155608!2d80.05739097585098!3d12.825740487476839!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a52f70d6eb8bcbb%3A0x7d6c6e7a2b9a7102!2sGuduvanchery%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1708450123456!5m2!1sen!2sin" 
                 className="w-full h-full border-0" 
                 allowFullScreen="" 
                 loading="lazy"
-                title="T Nagar Chennai Map"
+                title="Guduvanchery Map"
               ></iframe>
 
             </div>

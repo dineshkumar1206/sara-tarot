@@ -450,7 +450,7 @@ export default function Hero() {
           {/* Call to action */}
           <button
             className="saraa-cta"
-            onClick={() => navigate('/products/spiritual-healing')}
+            onClick={() => navigate('/products/tarot-consultation')}
             style={{
               position: 'absolute',
               bottom: 0,
