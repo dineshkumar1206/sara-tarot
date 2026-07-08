@@ -27,4 +27,16 @@ const User = sequelize.define('User', {
   tableName: 'users'
 });
 
+const bcrypt = require('bcryptjs');
+
+User.beforeSave(async (user) => {
+  if (user.changed('password')) {
+    user.password = await bcrypt.hash(user.password, 10);
+  }
+});
+
+User.prototype.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
+
 module.exports = User;
