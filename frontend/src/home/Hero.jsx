@@ -360,12 +360,11 @@ export default function Hero() {
                 Unlock
               </span>
 
-              {/* "The Best" outlined font layout */}
+              {/* "The Best" standard filled serif */}
               <span 
                 style={{ 
                   fontSize: 'clamp(42px, 5.5vw, 92px)', 
-                  color: 'transparent',
-                  WebkitTextStroke: `2px ${COLORS.cream}`,
+                  color: COLORS.cream,
                   letterSpacing: '0.5px'
                 }}
               >
@@ -373,11 +372,10 @@ export default function Hero() {
               </span>
             </div>
 
-            {/* "Future" massive serif italic layout breaking cleanly onto line two */}
+            {/* "Future" massive serif standard filled layout breaking cleanly onto line two */}
             <span
               style={{
                 display: 'block',
-                fontStyle: 'italic',
                 fontWeight: 400,
                 fontSize: 'clamp(60px, 8vw, 100px)',
                 lineHeight: 1.05,
