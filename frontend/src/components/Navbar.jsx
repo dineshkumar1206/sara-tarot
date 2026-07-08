@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../store/slices/authSlice';
 
 export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIsCartOpen }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false); // Mobile menu toggle
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Desktop dropdown toggle
   const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false); // Mobile sub-menu toggle
+
+  // Select admin auth state from Redux
+  const user = useSelector(state => state.auth.user);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/');
+  };
 
   // Calculate totals
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -209,6 +220,75 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
           </ul>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            {/* Login/Logout Action */}
+            {user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                <span style={{ color: '#f3f0ea', fontFamily: "'Inter', sans-serif", fontSize: '12px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Hi, {user.name.split(' ')[0]}
+                </span>
+                <Link
+                  to="/dashboard"
+                  style={{
+                    color: '#dfba6b',
+                    textDecoration: 'none',
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#f3f0ea'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#dfba6b'}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#dfba6b',
+                    border: '1px solid rgba(223, 186, 107, 0.4)',
+                    borderRadius: '2px',
+                    padding: '0.6rem 1.2rem',
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(223, 186, 107, 0.1)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                style={{
+                  backgroundColor: '#dfba6b',
+                  color: '#0f0c1b',
+                  border: 'none',
+                  borderRadius: '2px',
+                  padding: '0.6rem 1.2rem',
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f0ea'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dfba6b'}
+              >
+                Login
+              </button>
+            )}
+
             {/* Updated Cart Button */}
             <button
               onClick={() => setIsCartOpen(true)}
@@ -470,6 +550,83 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
               </Link>
             </li>
             
+            {user ? (
+              <>
+                <li style={{ marginTop: '0.5rem', textAlign: 'center' }}>
+                  <span style={{ color: '#f3f0ea', fontFamily: "'Inter', sans-serif", fontSize: '13px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Hi, {user.name}
+                  </span>
+                </li>
+                <li>
+                  <Link 
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    style={{
+                      display: 'block',
+                      textAlign: 'center',
+                      color: '#dfba6b',
+                      textDecoration: 'none',
+                      padding: '0.8rem',
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px'
+                    }}
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => { setIsOpen(false); handleLogout(); }}
+                    style={{
+                      width: '100%',
+                      backgroundColor: 'transparent',
+                      color: '#dfba6b',
+                      border: '1px solid rgba(223, 186, 107, 0.4)',
+                      padding: '0.8rem',
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <li>
+                <button 
+                  onClick={() => { setIsOpen(false); navigate('/login'); }}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#dfba6b',
+                    color: '#0f0c1b',
+                    border: 'none',
+                    padding: '0.8rem',
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  Login
+                </button>
+              </li>
+            )}
+
             <li style={{ marginTop: '0.75rem' }}>
               <button 
                 onClick={() => { setIsOpen(false); setIsCartOpen(true); }}

@@ -1,97 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
-const ITEMS_DATA = [
+const CRYSTAL_CATEGORIES = [
   {
-    id: 'crystal-rashi',
-    name: 'Rashi Crystal',
-    price: 1500,
-    type: 'Blessed & Energized',
-    desc: 'Harmonized for your specific zodiac sign (Rashi) to promote balance, aura cleansing, and positive celestial energy.',
-    image: '/rashi.png',
-    inclusions: [
-      'Specially selected for your Rashi (Moon Sign)',
-      'Spiritually cleansed and energized',
-      'Couriered with sacred prasadham and care instructions'
-    ]
+    name: 'Rashi',
+    desc: 'Specially energized crystals harmonized for your specific zodiac sign to bring balance and positive cosmic vibrations.',
+    image: '/rashi.png'
   },
   {
-    id: 'crystal-dhanyog',
-    name: 'Dhanyog Crystal',
-    price: 1800,
-    type: 'Blessed & Energized',
-    desc: 'Attracts financial growth, stability, and wealth abundance. Perfect for offices, lockers, and cash registers.',
-    image: '/dhanyog.png',
-    inclusions: [
-      'Attracts wealth and success vibrations',
-      'Spiritually cleansed and energized by Saraa',
-      'Couriered with sacred prasadham and activation guide'
-    ]
+    name: 'Dhanyog',
+    desc: 'Attracts wealth, financial abundance, and prosperity into your home and business environment.',
+    image: '/dhanyog.png'
   },
   {
-    id: 'crystal-bracelet',
-    name: 'Crystal Bracelet',
-    price: 1200,
-    type: 'Blessed & Energized',
-    desc: 'Elegant and powerful healing crystal bead bracelet to protect your aura and maintain daily emotional peace.',
-    image: '/bracelet.png',
-    inclusions: [
-      'Premium hand-picked crystal beads',
-      'Spiritually cleansed and energized for protection',
-      'Couriered with sacred prasadham and care instructions'
-    ]
+    name: 'Bracelet',
+    desc: 'Beautifully crafted bead bracelets for daily energetic protection, emotional peace, and spiritual support.',
+    image: '/bracelet.png'
   },
   {
-    id: 'crystal-karungali',
-    name: 'Karungali Malai / Bracelet',
-    price: 1600,
-    type: 'Blessed & Energized',
-    desc: 'Handcrafted black ebony wood beads to absorb negativity, enhance willpower, and shield against evil eye.',
-    image: '/karungali.png',
-    inclusions: [
-      'Authentic black ebony (Karungali) wood',
-      'Spiritually energized for shielding and confidence',
-      'Couriered with sacred prasadham'
-    ]
+    name: 'Karungali',
+    desc: 'Made from authentic black ebony wood to absorb negative energy, bring good luck, and shield against evil eye.',
+    image: '/karungali.png'
   },
   {
-    id: 'crystal-rudraksh',
-    name: 'Blessed Rudraksh Bead',
-    price: 1000,
-    type: 'Blessed & Energized',
-    desc: 'Sacred natural Rudraksh bead representing Lord Shiva. Instills deep mental peace, focus, and health.',
-    image: '/rudraksh.png',
-    inclusions: [
-      'Sacred natural Rudraksh bead',
-      'Spiritually energized for health and meditation focus',
-      'Couriered with sacred prasadham and care guide'
-    ]
+    name: 'Rudraksh',
+    desc: 'Sacred natural beads representing peace, health, and spiritual focus. Ideal for meditation and prayer.',
+    image: '/rudraksh.png'
   },
   {
-    id: 'crystal-yantra',
-    name: 'Energized Yantra',
-    price: 2000,
-    type: 'Blessed & Energized',
-    desc: 'Sacred geometry plate for homes/temples. Channellizes positive energy flows and repels dark vibrations.',
-    image: '/yantra.png',
-    inclusions: [
-      'Sacred geometric copper/brass yantra plate',
-      'Spiritually energized for home protection and harmony',
-      'Couriered with sacred prasadham and installation details'
-    ]
+    name: 'Yantra',
+    desc: 'Sacred geometric plates designed to channel positive energy, shield against negativity, and bring success.',
+    image: '/yantra.png'
   },
   {
-    id: 'crystal-pyrite',
-    name: 'Golden Pyrite',
-    price: 1800,
-    type: 'Blessed & Energized',
+    name: 'Pyrite',
     desc: 'The golden stone of luck, abundance, and business growth. Ideal for work tables and wealth manifestation.',
-    image: '/pyrite.png',
-    inclusions: [
-      'High-grade golden Pyrite crystal',
-      'Spiritually energized for wealth attraction',
-      'Couriered with sacred prasadham and care instructions'
-    ]
+    image: '/pyrite.png'
   }
 ];
 
@@ -105,17 +50,46 @@ const POLICY_DATA = {
 };
 
 export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [activeItemId, setActiveItemId] = useState(null);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCrystals = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/products');
+        setItems(res.data);
+      } catch (err) {
+        console.error('Failed to load crystals from database. Using fallback seed data.', err);
+        // Map local fallback items
+        const fallbacks = CRYSTAL_CATEGORIES.map((cat, idx) => ({
+          id: `fallback-${idx}`,
+          name: `${cat.name} Crystal Product`,
+          price: 1500 + idx * 100,
+          type: 'Blessed & Energized',
+          category: cat.name,
+          desc: cat.desc,
+          image: cat.image,
+          inclusions: ['Cleansed & energized', 'Sacred prasadham included']
+        }));
+        setItems(fallbacks);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCrystals();
+  }, []);
 
   const handleAddToCart = (item) => {
     if (!setCart) return;
 
-    const existingItem = cart.find((c) => c.id === item.id);
+    const existingItem = cart.find((c) => c.id === item.id || c.id === `crystal-${item.id}`);
 
     if (existingItem) {
       setCart(
         cart.map((c) =>
-          c.id === item.id
+          (c.id === item.id || c.id === `crystal-${item.id}`)
             ? { ...c, quantity: c.quantity + 1 }
             : c
         )
@@ -124,7 +98,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
       setCart([
         ...cart,
         {
-          id: item.id,
+          id: item.id || `crystal-${item.name.toLowerCase().replace(/\s+/g, '-')}`,
           name: item.name,
           price: item.price,
           image: item.image || '/saraa-logo.jpeg',
@@ -147,7 +121,12 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
     setActiveItemId(null);
   };
 
-  const currentItem = ITEMS_DATA.find((item) => item.id === activeItemId);
+  // Filter items based on active category selection (default to all items)
+  const filteredItems = selectedCategory
+    ? items.filter(item => item.category && item.category.toLowerCase() === selectedCategory.toLowerCase())
+    : items;
+
+  const currentItem = items.find((item) => item.id === activeItemId);
 
   return (
     <div style={{ backgroundColor: '#0f0c1b', minHeight: '100vh', color: '#f3f0ea', fontFamily: "'Inter', sans-serif", padding: '4rem 2rem 6rem 2rem', boxSizing: 'border-box' }}>
@@ -157,196 +136,227 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
         <div style={{ marginBottom: '2.5rem', fontSize: '13px', letterSpacing: '0.5px' }}>
           <Link to="/" style={{ color: 'rgba(243, 240, 234, 0.5)', textDecoration: 'none' }}>Home</Link>
           <span style={{ color: 'rgba(243, 240, 234, 0.3)', margin: '0 8px' }}>/</span>
-          <span style={{ color: '#dfba6b' }}>Crystals</span>
+          {selectedCategory ? (
+            <>
+              <span 
+                onClick={() => setSelectedCategory(null)} 
+                style={{ color: 'rgba(243, 240, 234, 0.5)', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                Crystals
+              </span>
+              <span style={{ color: 'rgba(243, 240, 234, 0.3)', margin: '0 8px' }}>/</span>
+              <span style={{ color: '#dfba6b' }}>{selectedCategory}</span>
+            </>
+          ) : (
+            <span style={{ color: '#dfba6b' }}>Crystals</span>
+          )}
         </div>
 
         {/* Header Section */}
-        <div style={{ marginBottom: '4rem', borderBottom: '1px solid rgba(223, 186, 107, 0.15)', paddingBottom: '2.5rem' }}>
+        <div style={{ marginBottom: '3rem', borderBottom: '1px solid rgba(223, 186, 107, 0.15)', paddingBottom: '2.5rem' }}>
           <span style={{ color: '#dfba6b', letterSpacing: '2px', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>
             SACRED GEOMETRY & ENERGY TOOLS
           </span>
           <h1 style={{ color: '#dfba6b', fontFamily: "'Cinzel', serif", fontSize: '2.8rem', fontWeight: '400', margin: '0.5rem 0 1.5rem 0', textTransform: 'uppercase', letterSpacing: '1px', lineHeight: '1.2' }}>
-            Crystals
+            {selectedCategory ? `${selectedCategory} Collection` : 'Crystals'}
           </h1>
-          <p style={{ color: 'rgba(243, 240, 234, 0.8)', fontSize: '1.05rem', lineHeight: '1.7', maxWidth: '800px', margin: 0 }}>
-            A curated selection of natural crystals, hand-selected, cleansed, and programmed with specific intentions by Sara to support your healing and manifest your desires.
+          <p style={{ color: 'rgba(243, 240, 234, 0.8)', fontSize: '1.05rem', lineHeight: '1.7', maxWidth: '800px', margin: '0 0 2rem 0' }}>
+            {(() => {
+              const catData = CRYSTAL_CATEGORIES.find(c => c.name.toLowerCase() === (selectedCategory || '').toLowerCase());
+              return catData ? catData.desc : 'A curated selection of natural crystal categories, hand-selected, cleansed, and programmed with specific intentions by Sara to support your healing and manifest your desires.';
+            })()}
           </p>
-        </div>
 
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '3rem', flexWrap: 'wrap' }}>
-          
-          {/* Items Listing Column */}
-          <div style={{ flex: '2 1 600px' }}>
-            <h3 style={{ color: '#dfba6b', fontFamily: "'Cinzel', serif", fontSize: '1.5rem', marginBottom: '2rem', borderBottom: '1px solid rgba(223, 186, 107, 0.1)', paddingBottom: '0.5rem', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-              Available Products
-            </h3>
-
-            {/* Cards Grid Layout */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-              gap: '2rem' 
-            }}>
-              {ITEMS_DATA.map((item) => (
-                <div 
-                  key={item.id}
-                  onClick={(e) => handleOpenPopup(item.id, e)}
-                  style={{
-                    backgroundColor: '#130f24',
-                    border: '1px solid rgba(223, 186, 107, 0.15)',
-                    borderRadius: '4px',
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(223, 186, 107, 0.5)';
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(223, 186, 107, 0.15)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  {/* Card Image */}
-                  {item.image && (
-                    <div style={{ width: '100%', height: '200px', overflow: 'hidden', position: 'relative' }}>
-                      <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, #130f24, transparent)' }} />
-                    </div>
-                  )}
-
-                  {/* Card Content */}
-                  <div style={{ padding: '1.25rem', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ color: '#dfba6b', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600', marginBottom: '4px' }}>
-                        {item.type}
-                      </div>
-                      <h4 style={{ color: '#f3f0ea', fontSize: '1.15rem', margin: '0 0 0.5rem 0', fontWeight: '500', lineHeight: '1.3' }}>
-                        {item.name}
-                      </h4>
-                      <p style={{ color: 'rgba(243, 240, 234, 0.7)', fontSize: '0.85rem', lineHeight: '1.4', margin: '0 0 1rem 0' }}>
-                        {item.desc}
-                      </p>
-                    </div>
-
-                    <div>
-                      <div style={{ color: '#dfba6b', fontSize: '1.4rem', fontWeight: '600', margin: '0.75rem 0' }}>
-                        ₹{item.price.toLocaleString('en-IN')}
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
-                        <button 
-                          onClick={(e) => handleOpenPopup(item.id, e)}
-                          style={{
-                            flex: 1,
-                            backgroundColor: 'transparent',
-                            color: '#dfba6b',
-                            border: '1px solid rgba(223, 186, 107, 0.4)',
-                            padding: '0.6rem',
-                            fontSize: '0.75rem',
-                            fontWeight: '600',
-                            textTransform: 'uppercase',
-                            letterSpacing: '1px',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s'
-                          }}
-                        >
-                          Details
-                        </button>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAddToCart(item);
-                          }}
-                          style={{
-                            flex: 1,
-                            backgroundColor: '#dfba6b',
-                            color: '#0f0c1b',
-                            border: 'none',
-                            padding: '0.6rem',
-                            fontSize: '0.75rem',
-                            fontWeight: '600',
-                            textTransform: 'uppercase',
-                            letterSpacing: '1px',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          Add To Cart
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Guidelines Sidebar Column */}
-          <div style={{ flex: '1 1 300px' }}>
-            <div 
+          {/* Elegant Horizontal Category Selector Buttons */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '1.5rem' }}>
+            <button
+              onClick={() => setSelectedCategory(null)}
               style={{
-                backgroundColor: '#130f24',
-                border: '1px solid rgba(223, 186, 107, 0.25)',
-                borderRadius: '6px',
-                padding: '2rem',
-                position: 'sticky',
-                top: '120px',
-                backgroundImage: 'linear-gradient(to bottom, rgba(223, 186, 107, 0.02), transparent)'
+                backgroundColor: selectedCategory === null ? '#dfba6b' : 'rgba(223, 186, 107, 0.05)',
+                color: selectedCategory === null ? '#0f0c1b' : '#dfba6b',
+                border: '1px solid rgba(223, 186, 107, 0.3)',
+                padding: '0.6rem 1.25rem',
+                borderRadius: '20px',
+                fontSize: '12px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}
+              onMouseEnter={(e) => {
+                if (selectedCategory !== null) {
+                  e.currentTarget.style.backgroundColor = 'rgba(223, 186, 107, 0.15)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedCategory !== null) {
+                  e.currentTarget.style.backgroundColor = 'rgba(223, 186, 107, 0.05)';
+                }
               }}
             >
-              <h4 style={{ color: '#dfba6b', fontFamily: "'Cinzel', serif", fontSize: '1.25rem', marginBottom: '1.25rem', borderBottom: '1px solid rgba(223, 186, 107, 0.1)', paddingBottom: '0.5rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                Important Notes
-              </h4>
-              <p style={{ color: 'rgba(243, 240, 234, 0.9)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
-                {POLICY_DATA.intro}
-              </p>
-              
-              <ul style={{ paddingLeft: '1.2rem', margin: 0, color: 'rgba(243, 240, 234, 0.75)', lineHeight: '1.7', fontSize: '0.9rem' }}>
-                {POLICY_DATA.points.map((pt, i) => (
-                  <li key={i} style={{ marginBottom: '0.8rem', listStyleType: 'square' }}>
-                    {pt}
-                  </li>
-                ))}
-              </ul>
-
-              <div style={{ borderTop: '1px solid rgba(223, 186, 107, 0.15)', marginTop: '2rem', paddingTop: '1.5rem', textAlign: 'center' }}>
-                <span style={{ fontSize: '12px', color: 'rgba(243, 240, 234, 0.5)', display: 'block', marginBottom: '1rem' }}>
-                  All products require pre-payment verification.
-                </span>
-                <Link 
-                  to="/checkout" 
-                  style={{
-                    display: 'block',
-                    backgroundColor: 'transparent',
-                    color: '#dfba6b',
-                    border: '1px solid rgba(223, 186, 107, 0.5)',
-                    padding: '0.75rem',
-                    textDecoration: 'none',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(223, 186, 107, 0.1)';
-                    e.currentTarget.style.borderColor = '#dfba6b';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.borderColor = 'rgba(223, 186, 107, 0.5)';
-                  }}
-                >
-                  View My Cart / Pay
-                </Link>
-              </div>
-            </div>
+              All Crystals
+            </button>
+            {CRYSTAL_CATEGORIES.map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => setSelectedCategory(cat.name)}
+                style={{
+                  backgroundColor: selectedCategory === cat.name ? '#dfba6b' : 'rgba(223, 186, 107, 0.05)',
+                  color: selectedCategory === cat.name ? '#0f0c1b' : '#dfba6b',
+                  border: '1px solid rgba(223, 186, 107, 0.3)',
+                  padding: '0.6rem 1.25rem',
+                  borderRadius: '20px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedCategory !== cat.name) {
+                    e.currentTarget.style.backgroundColor = 'rgba(223, 186, 107, 0.15)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedCategory !== cat.name) {
+                    e.currentTarget.style.backgroundColor = 'rgba(223, 186, 107, 0.05)';
+                  }
+                }}
+              >
+                {cat.name}
+              </button>
+            ))}
           </div>
+        </div>
 
+        {/* Main Content Grid (Full Width) */}
+        <div style={{ width: '100%' }}>
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '5rem 0' }}>
+              <span style={{ color: '#dfba6b', fontSize: '15px', letterSpacing: '1px' }}>Loading products...</span>
+            </div>
+          ) : (
+            <>
+              {filteredItems.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '6rem 0', border: '1px dashed rgba(223, 186, 107, 0.15)', borderRadius: '4px' }}>
+                  <p style={{ color: 'rgba(243, 240, 234, 0.6)', margin: 0 }}>No products available in this category yet.</p>
+                </div>
+              ) : (
+                /* Cards Grid Layout */
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+                  gap: '2rem' 
+                }}>
+                  {filteredItems.map((item) => (
+                    <div 
+                      key={item.id}
+                      onClick={(e) => handleOpenPopup(item.id, e)}
+                      style={{
+                        backgroundColor: '#130f24',
+                        border: '1px solid rgba(223, 186, 107, 0.15)',
+                        borderRadius: '4px',
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(223, 186, 107, 0.5)';
+                        e.currentTarget.style.transform = 'translateY(-4px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(223, 186, 107, 0.15)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                    >
+                      {/* Card Image */}
+                      {item.image && (
+                        <div style={{ width: '100%', height: '200px', overflow: 'hidden', position: 'relative' }}>
+                           <img 
+                             src={item.image} 
+                             alt={item.name} 
+                             style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                             onError={(e) => {
+                               e.target.onerror = null; 
+                               e.target.src = '/saraa-logo.jpeg';
+                             }}
+                           />
+                           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, #130f24, transparent)' }} />
+                        </div>
+                      )}
+                      
+                      {/* Card Content */}
+                      <div style={{ padding: '1.25rem', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                          <div style={{ color: '#dfba6b', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600', marginBottom: '4px' }}>
+                            {item.type}
+                          </div>
+                          <h4 style={{ color: '#f3f0ea', fontSize: '1.15rem', margin: '0 0 0.5rem 0', fontWeight: '500', lineHeight: '1.3' }}>
+                            {item.name}
+                          </h4>
+                          <p style={{ color: 'rgba(243, 240, 234, 0.7)', fontSize: '0.85rem', lineHeight: '1.4', margin: '0 0 1rem 0' }}>
+                            {item.desc}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <div style={{ color: '#dfba6b', fontSize: '1.4rem', fontWeight: '600', margin: '0.75rem 0' }}>
+                            ₹{item.price.toLocaleString('en-IN')}
+                          </div>
+                          
+                          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
+                            <button 
+                              onClick={(e) => handleOpenPopup(item.id, e)}
+                              style={{
+                                flex: 1,
+                                backgroundColor: 'transparent',
+                                color: '#dfba6b',
+                                border: '1px solid rgba(223, 186, 107, 0.4)',
+                                padding: '0.6rem',
+                                fontSize: '0.75rem',
+                                fontWeight: '600',
+                                textTransform: 'uppercase',
+                                letterSpacing: '1px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              Details
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddToCart(item);
+                              }}
+                              style={{
+                                flex: 1,
+                                backgroundColor: '#dfba6b',
+                                color: '#0f0c1b',
+                                border: 'none',
+                                padding: '0.6rem',
+                                fontSize: '0.75rem',
+                                fontWeight: '600',
+                                textTransform: 'uppercase',
+                                letterSpacing: '1px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Add To Cart
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
       </div>
@@ -456,7 +466,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
                     What this product includes:
                   </h4>
                   <ul style={{ paddingLeft: '1.2rem', margin: '0 0 2rem 0', color: 'rgba(243, 240, 234, 0.75)', lineHeight: '1.7', fontSize: '0.9rem' }}>
-                    {currentItem.inclusions.map((inc, index) => (
+                    {Array.isArray(currentItem.inclusions) && currentItem.inclusions.map((inc, index) => (
                       <li key={index} style={{ marginBottom: '0.4rem' }}>{inc}</li>
                     ))}
                   </ul>

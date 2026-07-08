@@ -9,6 +9,8 @@ import ScrollToTop from './components/ScrollToTop';
 import ProductCategoryDetail from './pages/ProductCategoryDetail';
 import About from './pages/About/About';
 import Contact from './pages/Contact';
+import Login from './pages/Login';
+import Dashboard from './dashboard/Dashboard';
 
 export default function App() {
   const [cart, setCart] = useState([]);
@@ -34,14 +36,18 @@ export default function App() {
     });
   }, [location.pathname, location.hash]);
 
+  const isDashboard = location.pathname.startsWith('/dashboard');
+
   return (
     <div>
-      <Navbar 
-        cartItems={cart} 
-        setCartItems={setCart} 
-        isCartOpen={isCartOpen} 
-        setIsCartOpen={setIsCartOpen} 
-      />
+      {!isDashboard && (
+        <Navbar 
+          cartItems={cart} 
+          setCartItems={setCart} 
+          isCartOpen={isCartOpen} 
+          setIsCartOpen={setIsCartOpen} 
+        />
+      )}
       <ScrollToTop />
       
       <Routes>
@@ -79,9 +85,11 @@ export default function App() {
         />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
       
-      <Footer />
+      {!isDashboard && <Footer />}
     </div>
   );
 }
