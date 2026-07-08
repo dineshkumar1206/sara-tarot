@@ -149,7 +149,7 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
                   {[
                     { label: 'Tarot Private Consultation', path: '/products/tarot-consultation' },
                     { label: 'Spiritual Healing', path: '/products/spiritual-healing' },
-                    { label: 'Blessed Crystals', path: '/products/crystals' },
+                    { label: 'Crystals', path: '/products/crystals' },
                     { label: 'Murugar Cards', path: '/products/murugar-cards' },
                     { label: 'Tarot Reading Classes', path: '/products/tarot-classes' },
                     { label: 'Spiritual Counseling', path: '/products/counseling-classes' },
@@ -404,7 +404,7 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
                   {[
                     { label: 'Tarot Private Consultation', path: '/products/tarot-consultation' },
                     { label: 'Spiritual Healing', path: '/products/spiritual-healing' },
-                    { label: 'Blessed Crystals', path: '/products/crystals' },
+                    { label: 'Crystals', path: '/products/crystals' },
                     { label: 'Murugar Cards', path: '/products/murugar-cards' },
                     { label: 'Tarot Reading Classes', path: '/products/tarot-classes' },
                     { label: 'Spiritual Counseling', path: '/products/counseling-classes' },
