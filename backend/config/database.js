@@ -8,7 +8,7 @@ const isProduction = process.env.NODE_ENV === 'production' ||
 
 const dbPort = isProduction ? 3306 : parseInt(DB_PORT || '3307', 10);
 
-let resolvedDbName = DB_NAME || 'sara-tarot-db';
+let resolvedDbName = DB_NAME || 'sara-tarot-DB';
 const dbUser = DB_USER || 'root';
 
 // Auto-prepend amigoweb_ prefix to database name if it was omitted in environment variables
