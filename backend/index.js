@@ -5,11 +5,29 @@ const sequelize = require('./config/database');
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// --- UPDATE: Configured CORS for your frontend URLs ---
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://amigowebster.in',
+  'http://amigowebster.in',
+  'https://www.amigowebster.in',
+  'http://www.amigowebster.in'
+];
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
 app.use(express.json());
 
-// Routes
+// --- UPDATE: Simplified routes for cPanel ---
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/products', require('./routes/products'));
 
@@ -40,20 +58,22 @@ const seedAdminUser = async () => {
   }
 };
 
-// Test DB connection and Sync
-sequelize.authenticate()
-  .then(() => {
-    console.log('Database connected successfully.');
-    // Sync models with alter: true to dynamically update column types
-    return sequelize.sync({ alter: true });
-  })
-  .then(async () => {
-    console.log('Database tables synchronized.');
-    await seedAdminUser();
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+// Start the server immediately so it listens on the port (preventing 503 errors on live hosting)
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  
+  // Connect and sync the database asynchronously
+  sequelize.authenticate()
+    .then(() => {
+      console.log('Database connected successfully.');
+      return sequelize.sync({ alter: true });
+    })
+    .then(async () => {
+      console.log('Database tables synchronized.');
+      await seedAdminUser();
+    })
+    .catch(err => {
+      console.error('Unable to connect to the database:', err);
+      console.error('Please verify your live environment variables or cPanel database configuration.');
     });
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
+});

@@ -1,13 +1,28 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
+const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = process.env;
+
+const isProduction = process.env.NODE_ENV === 'production' || 
+                     (DB_USER && DB_USER.startsWith('amigoweb_'));
+
+const dbPort = isProduction ? 3306 : parseInt(DB_PORT || '3307', 10);
+
+let resolvedDbName = DB_NAME || 'sara-tarot-db';
+const dbUser = DB_USER || 'root';
+
+// Auto-prepend amigoweb_ prefix to database name if it was omitted in environment variables
+if (dbUser.startsWith('amigoweb_') && !resolvedDbName.startsWith('amigoweb_')) {
+  resolvedDbName = `amigoweb_${resolvedDbName}`;
+}
+
 const sequelize = new Sequelize(
-  process.env.DB_NAME || 'sara-tarot-db',
-  process.env.DB_USER || 'root',
-  process.env.DB_PASSWORD || '',
+  resolvedDbName,
+  dbUser,
+  DB_PASSWORD || '',
   {
-    host: process.env.DB_HOST || '127.0.0.1',
-    port: process.env.DB_PORT || 3307,
+    host: DB_HOST || '127.0.0.1',
+    port: dbPort,
     dialect: 'mysql',
     logging: false, // Set to console.log to see SQL queries
     define: {
