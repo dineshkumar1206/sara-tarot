@@ -13,14 +13,30 @@ const allowedOrigins = [
   'https://amigowebster.in',
   'http://amigowebster.in',
   'https://www.amigowebster.in',
-  'http://www.amigowebster.in'
+  'http://www.amigowebster.in',
+  'https://sara-tarot.vercel.app'
 ];
 if (process.env.FRONTEND_URL) {
   allowedOrigins.push(process.env.FRONTEND_URL);
 }
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, or postman)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is allowed
+    const isAllowed = allowedOrigins.includes(origin) || 
+                      origin.startsWith('http://localhost:') || 
+                      origin.endsWith('.vercel.app') || 
+                      origin.endsWith('amigowebster.in');
+                      
+    if (isAllowed) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
