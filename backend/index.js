@@ -43,14 +43,25 @@ app.use(cors({
 
 app.use(express.json());
 
-// --- UPDATE: Simplified routes for cPanel ---
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/products', require('./routes/products'));
+// --- UPDATE: Register routes with and without the subdirectory prefix for cPanel deployment compatibility ---
+const registerRoutes = (prefix) => {
+  const cleanPrefix = prefix === '/' ? '/' : `/${prefix.replace(/^\/|\/$/g, '')}/`;
+  
+  app.use(cleanPrefix === '/' ? '/api/auth' : `${cleanPrefix}api/auth`, require('./routes/auth'));
+  app.use(cleanPrefix === '/' ? '/api/products' : `${cleanPrefix}api/products`, require('./routes/products'));
+  
+  app.get(cleanPrefix === '/' ? '/' : cleanPrefix.slice(0, -1), (req, res) => {
+    res.send('Saraa Tarot API is running...');
+  });
+  if (cleanPrefix !== '/') {
+    app.get(cleanPrefix, (req, res) => {
+      res.send('Saraa Tarot API is running...');
+    });
+  }
+};
 
-// Root Route
-app.get('/', (req, res) => {
-  res.send('Saraa Tarot API is running...');
-});
+registerRoutes('/');
+registerRoutes('/sara-tarot');
 
 const PORT = process.env.PORT || 5000;
 const User = require('./models/User');

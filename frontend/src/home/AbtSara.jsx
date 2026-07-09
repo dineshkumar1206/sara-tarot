@@ -9,7 +9,7 @@ const IMAGES = {
   mainPortrait: "/abt-1.png", 
   moonCircle: "/moon.png",    
   handArch: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&h=400&q=80",      
-  cardSpread: "/abt-2.jpg",    
+  cardSpread: "/abt.jpeg",    
   smallTextEmbed: "/ab-4.jpg", 
 };
 
@@ -58,8 +58,6 @@ export default function AbtSara() {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Poppins:wght@300;400;500;600&display=swap');
       `}</style>
 
-
-
       <motion.div 
         initial="hidden"
         whileInView="visible"
@@ -82,6 +80,22 @@ export default function AbtSara() {
         >
           The Story of Saraa Tarot
         </motion.h2>
+
+        {/* UPDATED MOON IMAGE
+          - Positioned absolute to sit just below the heading on the right side.
+          - Size significantly reduced (w-[75px] md:w-[90px]). 
+        */}
+        <motion.div 
+          style={{ y: moonY, rotate: moonRotate }}
+          whileHover={{ scale: 1.04 }}
+          className="absolute right-4 top-[100px] lg:right-10 lg:top-[120px] w-[75px] h-[75px] md:w-[90px] md:h-[90px] overflow-hidden rounded-full border border-[#D9B56A]/15 shadow-[0_15px_35px_rgba(0,0,0,0.3)] bg-[#1D1430] z-20 hidden md:block"
+        >
+          <img 
+            src={IMAGES.moonCircle} 
+            alt="Esoteric moon dynamic illustration" 
+            className="w-full h-full object-cover block scale-[1.33]" 
+          />
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr_1.1fr] gap-12 items-center">
           
@@ -119,18 +133,7 @@ export default function AbtSara() {
                 Connect With Me
               </button>
               
-              {/* Miniature Embedded Action Image Area - Commented out per user request
-              <motion.div 
-                style={{ x: textEmbedX }}
-                className="w-[140px] h-[105px] overflow-hidden rounded border border-[#D9B56A]/15 flex-shrink-0 bg-[#1D1430]"
-              >
-                <img 
-                  src={IMAGES.smallTextEmbed} 
-                  alt="Tarot reading detail element" 
-                  className="w-full h-full object-cover block" 
-                />
-              </motion.div>
-              */}
+              {/* Miniature Embedded Action Image Area - Commented out per user request */}
             </div>
           </motion.div>
 
@@ -139,38 +142,16 @@ export default function AbtSara() {
             variants={fadeInUpVariants} 
             className="flex flex-col items-center gap-6"
           >
-            {/* Moon Circular Crop Image Box */}
-            <motion.div 
-              style={{ y: moonY, rotate: moonRotate }}
-              whileHover={{ scale: 1.04 }}
-              className="w-[160px] h-[160px] overflow-hidden rounded-full border border-[#D9B56A]/15 shadow-[0_15px_35px_rgba(0,0,0,0.3)] bg-[#1D1430] flex-shrink-0 -mt-12"
-            >
-              <img 
-                src={IMAGES.moonCircle} 
-                alt="Esoteric moon dynamic illustration" 
-                className="w-full h-full object-cover block scale-[1.33]" 
-              />
-            </motion.div>
+            {/* Sacred Arch Framed Image Box - Commented out per user request */}
 
-            {/* Sacred Arch Framed Image Box - Commented out per user request
-            <motion.div 
-              style={{ y: handArchY }}
-              whileHover={{ scale: 1.04 }}
-              className="w-[82%] aspect-square overflow-hidden rounded-[100px_100px_12px_12px] border border-[#D9B56A]/20 shadow-[0_15px_35px_rgba(0,0,0,0.3)] bg-[#1D1430]"
-            >
-              <img 
-                src={IMAGES.handArch} 
-                alt="Mystical hands divination display" 
-                className="w-full h-full object-cover block" 
-              />
-            </motion.div>
+            {/* Lower Asymmetric Structural Image Box (UPDATED CURVE DESIGN + INCREASED HEIGHT) 
+                - Changed aspect ratio to aspect-[6/5] (taller than 4/3) and boosted min-h to 360px.
+                - Reduced the border radius curve on the bottom right from 130px to 80px.
             */}
-
-            {/* Lower Asymmetric Structural Image Box */}
             <motion.div 
               style={{ y: cardSpreadY }}
               whileHover={{ scale: 1.02 }}
-              className="w-[85%] mx-auto aspect-[16/11] overflow-hidden rounded-b-[80px] border border-[#D9B56A]/20 shadow-[0_20px_45px_rgba(0,0,0,0.35)] bg-[#1D1430]"
+              className="w-[95%] mx-auto aspect-[6/5] min-h-[360px] overflow-hidden rounded-2xl rounded-br-[80px] border border-[#D9B56A]/20 shadow-[0_20px_45px_rgba(0,0,0,0.35)] bg-[#1D1430]"
             >
               <img 
                 src={IMAGES.cardSpread} 
@@ -181,12 +162,6 @@ export default function AbtSara() {
           </motion.div>
         </div>
 
-        {/* Bottom CTA Button */}
-        {/* <button 
-          className="md:absolute md:right-0 md:bottom-[-60px] md:translate-y-0 mt-12 md:mt-0 mx-auto md:mx-0 w-fit block md:inline-block z-10 font-['Poppins'] text-[12px] font-medium tracking-[2px] uppercase bg-[#D9B56A] text-[#0A0713] py-[18px] px-9 rounded shadow-[0_10px_30px_rgba(0,0,0,0.3)] hover:bg-[#F4F0EA] hover:text-[#0A0713] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_rgba(184,70,122,0.2)]"
-        >
-          Book A Session
-        </button> */}
       </motion.div>
     </div>
   );
