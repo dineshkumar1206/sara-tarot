@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const SERVICES_DATA = [
   {
@@ -49,6 +50,18 @@ const SERVICES_DATA = [
   }
 ];
 
+// ==========================================
+// FRAMER MOTION CONFIG
+// ==========================================
+const fadeInUpVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.8, ease: [0.25, 1, 0.5, 1] } 
+  }
+};
+
 export default function Products({ cart = [], setCart, setIsCartOpen }) {
   const navigate = useNavigate();
   const [activeServiceId, setActiveServiceId] = React.useState(null);
@@ -95,255 +108,150 @@ export default function Products({ cart = [], setCart, setIsCartOpen }) {
   const currentService = SERVICES_DATA.find(s => s.id === activeServiceId);
 
   return (
-    <div id="products-section" style={{ backgroundColor: '#0f0c1b', minHeight: '100vh', color: '#f3f0ea', fontFamily: "'Inter', sans-serif", position: 'relative' }}>
+    <div id="products-section" className="relative bg-[#0f0c1b] min-h-screen text-[#f3f0ea] font-['Inter',sans-serif]">
       
       {/* --- SERVICE GRID PAGE --- */}
-      <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '3rem 2rem' }}>
-        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-          <h1 style={{ color: '#dfba6b', fontSize: '2.5rem', fontWeight: '300', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '0.5rem' }}>
+      <motion.div 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        transition={{ staggerChildren: 0.12 }}
+        className="max-w-[1240px] mx-auto py-12 px-8"
+      >
+        <motion.div variants={fadeInUpVariants} className="text-center mb-14">
+          <h1 className="text-[#dfba6b] text-4xl font-light uppercase tracking-[2px] mb-2">
             Amavasya Monthly Pooja
           </h1>
-          <p style={{ color: 'rgba(243, 240, 234, 0.6)', fontSize: '1rem', letterSpacing: '0.5px' }}>
+          <p className="text-[#f3f0ea]/60 text-base tracking-[0.5px]">
             Select a sacred ritual to invoke divine blessings, protection, and transformation.
           </p>
-        </div>
+        </motion.div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-          gap: '2.5rem',
-        }}>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-10">
           {SERVICES_DATA.map((service) => (
-            <div 
+            <motion.div 
               key={service.id}
+              variants={fadeInUpVariants}
               onClick={(e) => handleOpenPopup(service.id, e)}
-              style={{
-                backgroundColor: '#130f24',
-                border: '1px solid rgba(223, 186, 107, 0.15)',
-                borderRadius: '4px',
-                overflow: 'hidden',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(223, 186, 107, 0.5)';
-                e.currentTarget.style.transform = 'translateY(-4px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(223, 186, 107, 0.15)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
+              className="bg-[#130f24] border border-[#dfba6b]/15 rounded cursor-pointer overflow-hidden flex flex-col justify-between transition-all duration-300 ease-in-out hover:border-[#dfba6b]/50 hover:-translate-y-1"
             >
               {/* Card Image */}
-              <div style={{ width: '100%', height: '220px', overflow: 'hidden', position: 'relative' }}>
+              <div className="w-full h-[220px] overflow-hidden relative">
                 <img 
                   src={service.image} 
                   alt={service.title} 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  className="w-full h-full object-cover"
                 />
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(to top, #130f24, transparent)' }} />
+                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#130f24] to-transparent" />
               </div>
 
               {/* Card Content */}
-              <div style={{ padding: '1.5rem', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div className="p-6 flex-grow flex flex-col justify-between">
                 <div>
-                  <h3 style={{ color: '#f3f0ea', fontSize: '1.2rem', margin: '0 0 0.5rem 0', fontWeight: '500', lineHeight: '1.3' }}>
+                  <h3 className="text-[#f3f0ea] text-xl font-medium leading-tight m-0 mb-2">
                     {service.title}
                   </h3>
-                  <p style={{ color: '#dfba6b', fontSize: '0.85rem', fontStyle: 'italic', margin: '0 0 1rem 0', letterSpacing: '0.5px' }}>
+                  <p className="text-[#dfba6b] text-[13.5px] italic tracking-[0.5px] m-0 mb-4">
                     {service.tagline}
                   </p>
                 </div>
 
                 <div>
-                  <div style={{ color: '#dfba6b', fontSize: '1.5rem', fontWeight: '600', margin: '1rem 0' }}>
+                  <div className="text-[#dfba6b] text-2xl font-semibold my-4">
                     Rs. {service.price.toLocaleString('en-IN')}
                   </div>
 
-                  <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                  <div className="flex gap-4 mt-4">
                     <button 
                       onClick={(e) => handleOpenPopup(service.id, e)}
-                      style={{
-                        flex: 1,
-                        backgroundColor: 'transparent',
-                        color: '#dfba6b',
-                        border: '1px solid rgba(223, 186, 107, 0.4)',
-                        padding: '0.7rem',
-                        fontSize: '0.8rem',
-                        fontWeight: '600',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s'
-                      }}
+                      className="flex-1 bg-transparent text-[#dfba6b] border border-[#dfba6b]/40 p-[0.7rem] text-[13px] font-semibold uppercase tracking-[1px] cursor-pointer transition-all duration-200 hover:bg-[#dfba6b]/10 hover:border-[#dfba6b]"
                     >
                       View Details
                     </button>
                     <button 
                       onClick={(e) => handleAddToCart(service, e)}
-                      style={{
-                        flex: 1,
-                        backgroundColor: '#dfba6b',
-                        color: '#0f0c1b',
-                        border: 'none',
-                        padding: '0.7rem',
-                        fontSize: '0.8rem',
-                        fontWeight: '600',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                        cursor: 'pointer',
-                      }}
+                      className="flex-1 bg-[#dfba6b] text-[#0f0c1b] border-none p-[0.7rem] text-[13px] font-semibold uppercase tracking-[1px] cursor-pointer hover:bg-[#c9a65b] transition-colors duration-200"
                     >
                       Add To Cart
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* See More button */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '3.5rem' }}>
+        <motion.div variants={fadeInUpVariants} className="flex justify-center mt-14">
           <button
             onClick={() => navigate('/products/kali-pooja')}
-            style={{
-              backgroundColor: 'transparent',
-              color: '#dfba6b',
-              border: '1px solid rgba(223, 186, 107, 0.5)',
-              borderRadius: '2px',
-              padding: '0.9rem 2.2rem',
-              fontSize: '13px',
-              fontWeight: '600',
-              textTransform: 'uppercase',
-              letterSpacing: '1.5px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(223, 186, 107, 0.1)';
-              e.currentTarget.style.borderColor = '#dfba6b';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = 'rgba(223, 186, 107, 0.5)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
+            className="bg-transparent text-[#dfba6b] border border-[#dfba6b]/50 rounded-sm py-[0.9rem] px-[2.2rem] text-[13px] font-semibold uppercase tracking-[1.5px] cursor-pointer transition-all duration-300 ease hover:bg-[#dfba6b]/10 hover:border-[#dfba6b] hover:-translate-y-0.5"
           >
             See More
           </button>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* --- DETAILS MODAL POPUP --- */}
       {activeServiceId && currentService && (
         <div 
-          onClick={handleClosePopup} // Closes popup when clicking overlay background
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(10, 8, 20, 0.85)', // Dark premium blur overlay
-            backdropFilter: 'blur(6px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 2000, // Appears over the sticky Navbar layer
-            padding: '1rem',
-            boxSizing: 'border-box'
-          }}
+          onClick={handleClosePopup}
+          className="fixed inset-0 bg-[#0a0814]/85 backdrop-blur-sm flex items-center justify-center z-[2000] p-4"
         >
           {/* Modal Container */}
-          <div 
-            onClick={(e) => e.stopPropagation()} // Disables overlay clicking inside card body
-            style={{
-              backgroundColor: '#130f24',
-              border: '1px solid rgba(223, 186, 107, 0.25)',
-              borderRadius: '8px',
-              maxWidth: '900px',
-              width: '100%',
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              position: 'relative',
-              padding: '2.5rem',
-              boxSizing: 'border-box',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.6)'
-            }}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
+            onClick={(e) => e.stopPropagation()} 
+            className="bg-[#130f24] border border-[#dfba6b]/25 rounded-lg max-w-[900px] w-full max-h-[90vh] overflow-y-auto relative p-10 shadow-[0_20px_40px_rgba(0,0,0,0.6)]"
           >
             {/* Elegant Cross Closing Button */}
             <button 
               onClick={handleClosePopup}
-              style={{
-                position: 'absolute',
-                top: '1rem',
-                right: '1.5rem',
-                backgroundColor: 'transparent',
-                border: 'none',
-                color: '#dfba6b',
-                fontSize: '2rem',
-                fontWeight: '300',
-                cursor: 'pointer',
-                lineHeight: '1',
-                padding: '4px',
-                transition: 'transform 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.15)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              className="absolute top-4 right-6 bg-transparent border-none text-[#dfba6b] text-4xl font-light cursor-pointer leading-none p-1 transition-transform duration-200 hover:scale-110"
             >
               &times;
             </button>
 
             {/* Content Split Layout */}
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '2.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+            <div className="flex flex-row flex-wrap gap-10 mt-2">
               
               {/* Left Column: Image */}
-              <div style={{ flex: '1 1 350px' }}>
+              <div className="flex-[1_1_350px]">
                 <img 
                   src={currentService.image} 
                   alt={currentService.title} 
-                  style={{ 
-                    width: '100%', 
-                    borderRadius: '4px', 
-                    border: '1px solid rgba(223, 186, 107, 0.15)', 
-                    objectFit: 'cover', 
-                    height: '100%',
-                    minHeight: '300px',
-                    maxHeight: '400px'
-                  }}
+                  className="w-full rounded border border-[#dfba6b]/15 object-cover h-full min-h-[300px] max-h-[400px]"
                 />
               </div>
 
               {/* Right Column: Text & Pricing Info */}
-              <div style={{ flex: '1 2 400px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div className="flex-[1_2_400px] flex flex-col justify-between">
                 <div>
-                  <span style={{ color: '#dfba6b', textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '2px', fontWeight: '600' }}>
+                  <span className="text-[#dfba6b] uppercase text-xs tracking-[2px] font-semibold">
                     Amavasya Special Ritual
                   </span>
-                  <h2 style={{ color: '#f3f0ea', fontSize: '1.8rem', fontWeight: '300', margin: '0.5rem 0 0.75rem 0', lineHeight: '1.3' }}>
+                  <h2 className="text-[#f3f0ea] text-3xl font-light mt-2 mb-3 leading-tight">
                     {currentService.title}
                   </h2>
-                  <div style={{ color: '#dfba6b', fontSize: '1.75rem', fontWeight: '600', marginBottom: '1.25rem' }}>
+                  <div className="text-[#dfba6b] text-3xl font-semibold mb-5">
                     Rs. {currentService.price.toLocaleString('en-IN')}
                   </div>
                   
-                  <hr style={{ border: 'none', borderTop: '1px solid rgba(223, 186, 107, 0.15)', margin: '1rem 0' }} />
+                  <hr className="border-none border-t border-[#dfba6b]/15 my-4" />
                   
-                  <p style={{ color: 'rgba(243, 240, 234, 0.8)', lineHeight: '1.6', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+                  <p className="text-[#f3f0ea]/80 leading-relaxed text-[15px] mb-6">
                     {currentService.description}
                   </p>
 
-                  <h4 style={{ color: '#dfba6b', textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '0.5rem' }}>
+                  <h4 className="text-[#dfba6b] uppercase text-[13.5px] tracking-[1px] mb-2">
                     What this offering includes:
                   </h4>
-                  <ul style={{ paddingLeft: '1.2rem', margin: '0 0 2rem 0', color: 'rgba(243, 240, 234, 0.75)', lineHeight: '1.7', fontSize: '0.9rem' }}>
+                  <ul className="pl-5 m-0 mb-8 text-[#f3f0ea]/75 leading-loose text-sm list-disc">
                     {currentService.inclusions.map((inc, index) => (
-                      <li key={index} style={{ marginBottom: '0.4rem' }}>{inc}</li>
+                      <li key={index} className="mb-1">{inc}</li>
                     ))}
                   </ul>
                 </div>
@@ -351,31 +259,16 @@ export default function Products({ cart = [], setCart, setIsCartOpen }) {
                 <button 
                   onClick={(e) => {
                     handleAddToCart(currentService, e);
-                    handleClosePopup(); // Closes popup instantly upon successful booking
+                    handleClosePopup(); 
                   }}
-                  style={{
-                    backgroundColor: '#dfba6b',
-                    color: '#0f0c1b',
-                    border: 'none',
-                    padding: '1rem 2rem',
-                    fontSize: '0.95rem',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '1.5px',
-                    cursor: 'pointer',
-                    width: '100%',
-                    borderRadius: '2px',
-                    transition: 'opacity 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                  className="bg-[#dfba6b] text-[#0f0c1b] border-none py-4 px-8 text-[15px] font-semibold uppercase tracking-[1.5px] cursor-pointer w-full rounded-sm transition-opacity duration-200 hover:opacity-90"
                 >
                   Book Pooja (Add to Cart)
                 </button>
               </div>
 
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </div>
