@@ -57,6 +57,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
   const [activeItemId, setActiveItemId] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [healingPowerChecked, setHealingPowerChecked] = useState(false);
 
   useEffect(() => {
     if (subcategoryParam) {
@@ -99,12 +100,21 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
   const handleAddToCart = (item) => {
     if (!setCart) return;
 
-    const existingItem = cart.find((c) => c.id === item.id || c.id === `crystal-${item.id}`);
+    let finalPrice = item.price;
+    let nameSuffix = '';
+
+    if (healingPowerChecked) {
+      finalPrice += 1000;
+      nameSuffix = ' (+ Extra Healing Power)';
+    }
+
+    const cartItemId = healingPowerChecked ? `${item.id}-healing` : item.id;
+    const existingItem = cart.find((c) => c.id === cartItemId);
 
     if (existingItem) {
       setCart(
         cart.map((c) =>
-          (c.id === item.id || c.id === `crystal-${item.id}`)
+          c.id === cartItemId
             ? { ...c, quantity: c.quantity + 1 }
             : c
         )
@@ -113,9 +123,9 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
       setCart([
         ...cart,
         {
-          id: item.id || `crystal-${item.name.toLowerCase().replace(/\s+/g, '-')}`,
-          name: item.name,
-          price: item.price,
+          id: cartItemId || `crystal-${item.name.toLowerCase().replace(/\s+/g, '-')}${healingPowerChecked ? '-healing' : ''}`,
+          name: `${item.name}${nameSuffix}`,
+          price: finalPrice,
           image: item.image || '/saraa-logo.jpeg',
           quantity: 1
         }
@@ -244,6 +254,42 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
               </button>
             ))}
           </div>
+
+          {/* Healing Power Toggle */}
+          <div 
+            style={{ 
+              backgroundColor: 'rgba(223, 186, 107, 0.05)', 
+              border: '1px solid rgba(223, 186, 107, 0.3)', 
+              borderRadius: '4px',
+              padding: '1.25rem',
+              marginTop: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              cursor: 'pointer'
+            }}
+            onClick={() => setHealingPowerChecked(!healingPowerChecked)}
+          >
+            <input 
+              type="checkbox" 
+              checked={healingPowerChecked}
+              onChange={() => {}}
+              style={{ 
+                cursor: 'pointer',
+                width: '18px',
+                height: '18px',
+                accentColor: '#dfba6b'
+              }} 
+            />
+            <div>
+              <div style={{ fontWeight: '600', color: '#dfba6b', fontSize: '14px', letterSpacing: '0.5px' }}>
+                ADD HEALING POWER (+ Rs. 1,000)
+              </div>
+              <div style={{ fontSize: '12px', color: 'rgba(243, 240, 234, 0.7)', marginTop: '2px' }}>
+                Cleanses, activates, and programs the crystal with extra spiritual healing powers tailored to your intentions.
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Main Content Grid (Full Width) */}
@@ -321,7 +367,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
                         
                         <div>
                           <div style={{ color: '#dfba6b', fontSize: '1.4rem', fontWeight: '600', margin: '0.75rem 0' }}>
-                            ₹{item.price.toLocaleString('en-IN')}
+                            ₹{(item.price + (healingPowerChecked ? 1000 : 0)).toLocaleString('en-IN')}
                           </div>
                           
                           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
@@ -468,7 +514,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
                     {currentItem.name}
                   </h2>
                   <div style={{ color: '#dfba6b', fontSize: '1.75rem', fontWeight: '600', marginBottom: '1.25rem' }}>
-                    ₹{currentItem.price.toLocaleString('en-IN')}
+                    ₹{(currentItem.price + (healingPowerChecked ? 1000 : 0)).toLocaleString('en-IN')}
                   </div>
                   
                   <hr style={{ border: 'none', borderTop: '1px solid rgba(223, 186, 107, 0.15)', margin: '1rem 0' }} />
