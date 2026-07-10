@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { API_BASE_URL } from '../../config';
 
 const ITEMS_DATA = [
   {
@@ -55,6 +57,24 @@ const POLICY_DATA = {
 };
 
 export default function KaliPooja({ cart = [], setCart, setIsCartOpen }) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/products?category=Kali Pooja`);
+        setItems(res.data);
+      } catch (err) {
+        console.error('Failed to fetch Kali Pooja products. Using fallback.', err);
+        setItems(ITEMS_DATA);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchItems();
+  }, []);
+
   const handleAddToCart = (item) => {
     if (!setCart) return;
 
@@ -119,9 +139,18 @@ export default function KaliPooja({ cart = [], setCart, setIsCartOpen }) {
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {ITEMS_DATA.map((item) => (
-                <div 
-                  key={item.id}
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '3rem 0', color: '#dfba6b' }}>
+                  Loading offerings...
+                </div>
+              ) : items.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3rem 0', color: 'rgba(243, 240, 234, 0.6)' }}>
+                  No offerings available.
+                </div>
+              ) : (
+                items.map((item) => (
+                  <div 
+                    key={item.id}
                   style={{
                     backgroundColor: '#130f24',
                     border: '1px solid rgba(223, 186, 107, 0.15)',
@@ -188,7 +217,7 @@ export default function KaliPooja({ cart = [], setCart, setIsCartOpen }) {
                     </button>
                   </div>
                 </div>
-              ))}
+              )))}
             </div>
           </div>
 

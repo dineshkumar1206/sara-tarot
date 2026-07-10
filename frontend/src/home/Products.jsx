@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 const SERVICES_DATA = [
   {
@@ -64,7 +66,37 @@ const fadeInUpVariants = {
 
 export default function Products({ cart = [], setCart, setIsCartOpen }) {
   const navigate = useNavigate();
-  const [activeServiceId, setActiveServiceId] = React.useState(null);
+  const [activeServiceId, setActiveServiceId] = useState(null);
+  const [servicesData, setServicesData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/products?category=Kali Pooja`);
+        const mapped = res.data.map(p => ({
+          id: p.id,
+          title: p.name,
+          price: p.price,
+          tagline: p.type || 'Blessed & Energized',
+          image: p.image || '/saraa-logo.jpeg',
+          description: p.desc || '',
+          inclusions: Array.isArray(p.inclusions) ? p.inclusions : []
+        }));
+        setServicesData(mapped);
+      } catch (err) {
+        console.error('Failed to fetch Kali Pooja products for homepage. Using fallback.', err);
+        const fallbacks = SERVICES_DATA.map(s => ({
+          ...s,
+          inclusions: Array.isArray(s.inclusions) ? s.inclusions : []
+        }));
+        setServicesData(fallbacks);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
 
   const handleAddToCart = (service, e) => {
     e.stopPropagation(); 
@@ -105,7 +137,7 @@ export default function Products({ cart = [], setCart, setIsCartOpen }) {
     setActiveServiceId(null);
   };
 
-  const currentService = SERVICES_DATA.find(s => s.id === activeServiceId);
+  const currentService = servicesData.find(s => s.id === activeServiceId);
 
   return (
     <div id="products-section" className="relative bg-[#0f0c1b] min-h-screen text-[#f3f0ea] font-['Inter',sans-serif]">
@@ -128,57 +160,71 @@ export default function Products({ cart = [], setCart, setIsCartOpen }) {
         </motion.div>
 
         <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-10">
-          {SERVICES_DATA.map((service) => (
-            <motion.div 
-              key={service.id}
-              variants={fadeInUpVariants}
-              onClick={(e) => handleOpenPopup(service.id, e)}
-              className="bg-[#130f24] border border-[#dfba6b]/15 rounded cursor-pointer overflow-hidden flex flex-col justify-between transition-all duration-300 ease-in-out hover:border-[#dfba6b]/50 hover:-translate-y-1"
-            >
-              {/* Card Image */}
-              <div className="w-full h-[220px] overflow-hidden relative">
-                <img 
-                  src={service.image} 
-                  alt={service.title} 
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#130f24] to-transparent" />
-              </div>
-
-              {/* Card Content */}
-              <div className="p-6 flex-grow flex flex-col justify-between">
-                <div>
-                  <h3 className="text-[#f3f0ea] text-xl font-medium leading-tight m-0 mb-2">
-                    {service.title}
-                  </h3>
-                  <p className="text-[#dfba6b] text-[13.5px] italic tracking-[0.5px] m-0 mb-4">
-                    {service.tagline}
-                  </p>
+          {loading ? (
+            <div className="col-span-full text-center py-20 text-[#dfba6b]">
+              Loading pooja offerings...
+            </div>
+          ) : servicesData.length === 0 ? (
+            <div className="col-span-full text-center py-20 text-[#f3f0ea]/60 border border-dashed border-[#dfba6b]/25 rounded">
+              No pooja offerings found.
+            </div>
+          ) : (
+            servicesData.map((service) => (
+              <motion.div 
+                key={service.id}
+                variants={fadeInUpVariants}
+                onClick={(e) => handleOpenPopup(service.id, e)}
+                className="bg-[#130f24] border border-[#dfba6b]/15 rounded cursor-pointer overflow-hidden flex flex-col justify-between transition-all duration-300 ease-in-out hover:border-[#dfba6b]/50 hover:-translate-y-1"
+              >
+                {/* Card Image */}
+                <div className="w-full h-[220px] overflow-hidden relative">
+                  <img 
+                    src={service.image} 
+                    alt={service.title} 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/saraa-logo.jpeg';
+                    }}
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#130f24] to-transparent" />
                 </div>
 
-                <div>
-                  <div className="text-[#dfba6b] text-2xl font-semibold my-4">
-                    Rs. {service.price.toLocaleString('en-IN')}
+                {/* Card Content */}
+                <div className="p-6 flex-grow flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-[#f3f0ea] text-xl font-medium leading-tight m-0 mb-2">
+                      {service.title}
+                    </h3>
+                    <p className="text-[#dfba6b] text-[13.5px] italic tracking-[0.5px] m-0 mb-4">
+                      {service.tagline}
+                    </p>
                   </div>
 
-                  <div className="flex gap-4 mt-4">
-                    <button 
-                      onClick={(e) => handleOpenPopup(service.id, e)}
-                      className="flex-1 bg-transparent text-[#dfba6b] border border-[#dfba6b]/40 p-[0.7rem] text-[13px] font-semibold uppercase tracking-[1px] cursor-pointer transition-all duration-200 hover:bg-[#dfba6b]/10 hover:border-[#dfba6b]"
-                    >
-                      View Details
-                    </button>
-                    <button 
-                      onClick={(e) => handleAddToCart(service, e)}
-                      className="flex-1 bg-[#dfba6b] text-[#0f0c1b] border-none p-[0.7rem] text-[13px] font-semibold uppercase tracking-[1px] cursor-pointer hover:bg-[#c9a65b] transition-colors duration-200"
-                    >
-                      Add To Cart
-                    </button>
+                  <div>
+                    <div className="text-[#dfba6b] text-2xl font-semibold my-4">
+                      Rs. {service.price.toLocaleString('en-IN')}
+                    </div>
+
+                    <div className="flex gap-4 mt-4">
+                      <button 
+                        onClick={(e) => handleOpenPopup(service.id, e)}
+                        className="flex-1 bg-transparent text-[#dfba6b] border border-[#dfba6b]/40 p-[0.7rem] text-[13px] font-semibold uppercase tracking-[1px] cursor-pointer transition-all duration-200 hover:bg-[#dfba6b]/10 hover:border-[#dfba6b]"
+                      >
+                        View Details
+                      </button>
+                      <button 
+                        onClick={(e) => handleAddToCart(service, e)}
+                        className="flex-1 bg-[#dfba6b] text-[#0f0c1b] border-none p-[0.7rem] text-[13px] font-semibold uppercase tracking-[1px] cursor-pointer hover:bg-[#c9a65b] transition-colors duration-200"
+                      >
+                        Add To Cart
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          )}
         </div>
 
         {/* See More button */}

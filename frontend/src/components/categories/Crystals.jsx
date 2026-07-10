@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../../config';
 
@@ -51,16 +51,30 @@ const POLICY_DATA = {
 };
 
 export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const subcategoryParam = searchParams.get('subcategory');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [activeItemId, setActiveItemId] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (subcategoryParam) {
+      setSelectedCategory(subcategoryParam);
+    } else {
+      setSelectedCategory(null);
+    }
+  }, [subcategoryParam]);
+
+  useEffect(() => {
     const fetchCrystals = async () => {
       try {
         const res = await axios.get(`${API_BASE_URL}/api/products`);
-        setItems(res.data);
+        const crystalCatNames = CRYSTAL_CATEGORIES.map(c => c.name.toLowerCase());
+        const crystalItems = res.data.filter(item => 
+          item.category && crystalCatNames.includes(item.category.toLowerCase())
+        );
+        setItems(crystalItems);
       } catch (err) {
         console.error('Failed to load crystals from database. Using fallback seed data.', err);
         // Map local fallback items
@@ -140,7 +154,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
           {selectedCategory ? (
             <>
               <span 
-                onClick={() => setSelectedCategory(null)} 
+                onClick={() => setSearchParams({})} 
                 style={{ color: 'rgba(243, 240, 234, 0.5)', cursor: 'pointer', textDecoration: 'underline' }}
               >
                 Crystals
@@ -171,7 +185,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
           {/* Elegant Horizontal Category Selector Buttons */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '1.5rem' }}>
             <button
-              onClick={() => setSelectedCategory(null)}
+              onClick={() => setSearchParams({})}
               style={{
                 backgroundColor: selectedCategory === null ? '#dfba6b' : 'rgba(223, 186, 107, 0.05)',
                 color: selectedCategory === null ? '#0f0c1b' : '#dfba6b',
@@ -201,7 +215,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
             {CRYSTAL_CATEGORIES.map((cat) => (
               <button
                 key={cat.name}
-                onClick={() => setSelectedCategory(cat.name)}
+                onClick={() => setSearchParams({ subcategory: cat.name })}
                 style={{
                   backgroundColor: selectedCategory === cat.name ? '#dfba6b' : 'rgba(223, 186, 107, 0.05)',
                   color: selectedCategory === cat.name ? '#0f0c1b' : '#dfba6b',

@@ -10,10 +10,6 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
   'http://localhost:5174',
-  'https://amigowebster.in',
-  'http://amigowebster.in',
-  'https://www.amigowebster.in',
-  'http://www.amigowebster.in',
   'https://sara-tarot.vercel.app'
 ];
 if (process.env.FRONTEND_URL) {

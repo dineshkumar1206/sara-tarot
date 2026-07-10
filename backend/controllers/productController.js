@@ -19,7 +19,8 @@ const formatProduct = (product) => {
 };
 
 // Seed defaults
-const DEFAULT_CRYSTALS = [
+const DEFAULT_PRODUCTS = [
+  // --- Crystals ---
   {
     name: 'Rashi Crystal',
     price: 1500,
@@ -110,6 +111,199 @@ const DEFAULT_CRYSTALS = [
       'Spiritually energized for wealth attraction',
       'Couriered with sacred prasadham and care instructions'
     ]
+  },
+
+  // --- Tarot Private Consultation ---
+  {
+    name: 'One Question Consultation',
+    price: 500,
+    type: 'Voice Note Only',
+    category: 'Tarot Private Consultation',
+    desc: 'Submit 1 specific question. You will receive a detailed audio voice note explaining your cards and solutions.',
+    inclusions: ['Submit 1 specific question', 'Detailed audio voice note analysis', 'Remedial steps and suggestions']
+  },
+  {
+    name: '30 Minutes Session',
+    price: 2500,
+    type: 'Live Call or Voice Note',
+    category: 'Tarot Private Consultation',
+    desc: 'Covers up to 3 questions, detailed solutions, and interactive guidance.',
+    inclusions: ['Covers up to 3 questions', 'Live WhatsApp/Zoom call option', 'Remedies and energetic guidance']
+  },
+  {
+    name: '1 Hour Session',
+    price: 4000,
+    type: 'Live Call or Voice Note',
+    category: 'Tarot Private Consultation',
+    desc: 'Covers up to 7 questions, deep-dive solutions, remedies, and astrological chart guidance.',
+    inclusions: ['Covers up to 7 questions', 'Astrological and chart guidance included', 'Detailed remedies sheet']
+  },
+  {
+    name: 'Angel Messages',
+    price: 1500,
+    type: 'Voice Note Only',
+    category: 'Tarot Private Consultation',
+    desc: 'Receive special angel guidance and messages for 2 specific questions.',
+    inclusions: ['2 specific questions answered', 'Direct guidance from Angel decks', 'Voice note delivery']
+  },
+  {
+    name: 'Murugan Message Reading',
+    price: 1500,
+    type: 'Voice Note Only',
+    category: 'Tarot Private Consultation',
+    desc: 'Specific guidance and messages for 2 questions via Sara Murugan Cards.',
+    inclusions: ['2 questions answered', 'Murugan Cards invocation', 'Practical daily remedies']
+  },
+  {
+    name: 'Relationship Specific Session',
+    price: 3800,
+    type: 'Live Call or Voice Note',
+    category: 'Tarot Private Consultation',
+    desc: 'Specialized focus on relationship dynamics, healing, and compatibility analysis.',
+    inclusions: ['In-depth relationship reading', 'Compatibility energy checks', 'Harmonization suggestions']
+  },
+  {
+    name: 'Past, Present & Future Reading',
+    price: 6500,
+    type: 'Live Call or Voice Note',
+    category: 'Tarot Private Consultation',
+    desc: 'Comprehensive life spread analyzing your past influences, current state, and future paths.',
+    inclusions: ['12-card timeline spread', 'Comprehensive life areas cover', 'Full remedies guidance']
+  },
+  {
+    name: 'Past Life Reading Session',
+    price: 8000,
+    type: 'Live Call or Voice Note',
+    category: 'Tarot Private Consultation',
+    desc: 'Explore your past life karmas, lessons, and how they impact your current lifetime.',
+    inclusions: ['Karmic patterns exploration', 'Past life connection to current blocks', 'Soul lessons activation']
+  },
+  {
+    name: 'Spiritual Healing Session (40 Mins)',
+    price: 7000,
+    type: 'Duration: 40 minutes',
+    category: 'Tarot Private Consultation',
+    desc: 'Energy healing session tailored for relationships, money attraction, career, mental peace, or protection.',
+    inclusions: ['40 mins dedicated distance healing', 'Chakra balancing and realignment', 'Post-session summary & protection thread']
+  },
+  {
+    name: 'Special Spiritual Guidance & Remedies',
+    price: 5000,
+    type: 'Live Call or Zoom Call',
+    category: 'Tarot Private Consultation',
+    desc: 'Holistic spiritual guidance combined with active remedies for wellness.',
+    inclusions: ['Dedicated remedies roadmap', 'Direct video session with Sara', 'Energy protection steps']
+  },
+
+  // --- Spiritual Healing ---
+  {
+    name: 'Relationship Healing Session',
+    price: 7000,
+    type: 'Duration: 40 minutes',
+    category: 'Spiritual Healing',
+    desc: 'Clears toxic residue, heals emotional wounds, and opens heart chakra channels to restore relationship peace.',
+    inclusions: ['Chakra realignment', 'Toxic cord cutting', 'Love vibration amplification']
+  },
+  {
+    name: 'Money Attraction Healing',
+    price: 7000,
+    type: 'Duration: 40 minutes',
+    category: 'Spiritual Healing',
+    desc: 'Removes financial blockages, aligns root and solar plexus chakra frequencies to attract career growth and wealth.',
+    inclusions: ['Financial blockage removal', 'Abundance mindset tuning', 'Solar Plexus chakra activation']
+  },
+  {
+    name: 'Mental Peace & Aura Cleansing',
+    price: 7000,
+    type: 'Duration: 40 minutes',
+    category: 'Spiritual Healing',
+    desc: 'Dissolves stress, anxiety, and external negative vibes. Restores sleep cycles and mental clarity.',
+    inclusions: ['Auric field purification', 'Anxiety release guidance', 'Peace energy induction']
+  },
+  {
+    name: 'Protection Healing Shield',
+    price: 7000,
+    type: 'Duration: 40 minutes',
+    category: 'Spiritual Healing',
+    desc: 'Builds a protective auric shield to neutralize negative thoughts, evil eyes, and external psychic attacks.',
+    inclusions: ['Shielding and warding', 'Negative energy diversion', 'Kavach thread blessing']
+  },
+
+  // --- Murugar Cards ---
+  {
+    name: 'Sara Murugan Card Reading (2 Questions)',
+    price: 1500,
+    type: 'Voice Note Analysis',
+    category: 'Murugar Cards',
+    desc: 'Submit 2 specific questions. Receive deep insights, Murugan blessings, and practical remedies in a detailed voice note.',
+    inclusions: ['2 questions answered in depth', 'Murugan Vel remedies', 'WhatsApp audio format']
+  },
+
+  // --- Tarot Card Reading (Classes) ---
+  {
+    name: 'Professional Tarot Masterclass',
+    price: 15000,
+    type: 'Full Course Certification',
+    category: 'Tarot Card Reading',
+    desc: 'Interactive online classes covering Major & Minor Arcana, symbolism, intuition connection, specialized spreads, and business startup modules.',
+    inclusions: ['Live Zoom classes with recording logs', 'Complete workbook & cheat sheets', 'Certification of completion']
+  },
+
+  // --- Spiritual Counseling (Classes) ---
+  {
+    name: 'Spiritual Counseling & Life Coaching Course',
+    price: 12000,
+    type: 'Full Course Certification',
+    category: 'Spiritual Counseling',
+    desc: 'Learn active remedies, psychological-spiritual counseling frameworks, aura analysis, and techniques to guide others towards mental wellness.',
+    inclusions: ['Interactive coaching models', 'Aura scanning training', 'Certification and internship hours option']
+  },
+
+  // --- Kali Pooja ---
+  {
+    name: 'Basic Kali Pooja for Growth',
+    price: 2001,
+    type: 'With Prasadham included',
+    category: 'Kali Pooja',
+    desc: 'A monthly Amavasya pooja dedicated to removing stagnation and inviting positive energy, success, and spiritual/material growth into your life.',
+    image: '/card-1.jpg',
+    inclusions: ['Personalized Sankalpam (Intent)', 'Archana and Aarti', 'Sacred Prasadham couriered to your address']
+  },
+  {
+    name: 'Relationship Problems Pooja',
+    price: 3001,
+    type: 'Heal and harmonize your bonds',
+    category: 'Kali Pooja',
+    desc: 'Specially performed during Amavasya to clear misunderstandings, dissolve negative energies between couples or family members, and restore peace and affection.',
+    image: '/card-2.jpg',
+    inclusions: ['Specific prayers for relationship healing', 'Dosha Nivaran mantras', 'Blessed thread/Prasadham']
+  },
+  {
+    name: 'Business Kali Pooja',
+    price: 5001,
+    type: 'With Prasadham included',
+    category: 'Kali Pooja',
+    desc: 'Designed for entrepreneurs, business owners, and professionals. This ritual invokes Goddess Kali to eliminate corporate evil-eyes, overcome financial blocks, and attract wealth.',
+    image: '/card-3.jpg',
+    inclusions: ['Vyapaar Vridhi Sankalpam', 'Obstacle removal rituals', 'Energized Business Prasadham kit']
+  },
+  {
+    name: 'Black Magic Protection Pooja (Individual)',
+    price: 30000,
+    type: 'With complete protection materials & prasadham',
+    category: 'Kali Pooja',
+    desc: 'A deeply intensive, protective ritual tailored for one individual struggling with severe negativity, unexplained psychological weight, or dark energy interference.',
+    image: '/card-4.jpg',
+    inclusions: ['Individual specialized protection shield (Kavach)', 'Purification rituals using premium samagri', 'Complete customized protection items & Prasadham']
+  },
+  {
+    name: 'Black Magic Protection Pooja (Family)',
+    price: 50000,
+    type: 'Complete protection shield for the whole family',
+    category: 'Kali Pooja',
+    desc: 'An expansive and powerful household-level ritual that cleanses your entire living space and creates an unbreakable protective aura around all family members.',
+    image: '/card-5.jpg',
+    inclusions: ['Full family lineage protection Sankalpam', 'Home negative energy purging rituals', 'Comprehensive protective items & Prasadham pack for all members']
   }
 ];
 
@@ -120,7 +314,7 @@ const getProducts = async (req, res) => {
 
     // If database is empty, seed defaults
     if (products.length === 0) {
-      await Product.bulkCreate(DEFAULT_CRYSTALS);
+      await Product.bulkCreate(DEFAULT_PRODUCTS);
       products = await Product.findAll();
     }
 
