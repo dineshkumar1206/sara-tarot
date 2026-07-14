@@ -1,6 +1,63 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function ContactForm() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState({ type: '', message: '' }); // type: 'success' | 'error'
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus({ type: '', message: '' });
+
+    try {
+      const res = await axios.post(`${API_BASE_URL}/api/contact`, formData);
+      setStatus({
+        type: 'success',
+        message: res.data.message || 'Your message has been sent successfully.'
+      });
+      
+      // WhatsApp redirect integration
+      const whatsappNumber = "919655199507";
+      const formattedMessage = `Hello, I'd like to get in touch!\n\n` +
+                               `*Name:* ${formData.name}\n` +
+                               `*Email:* ${formData.email}\n` +
+                               `*Subject:* ${formData.subject}\n` +
+                               `*Message:* ${formData.message}`;
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(formattedMessage)}`;
+      window.open(whatsappUrl, '_blank');
+
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+    } catch (err) {
+      console.error(err);
+      setStatus({
+        type: 'error',
+        message: err.response?.data?.message || 'Something went wrong. Please try again.'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="bg-[#0A0713] py-24 w-full box-border px-4">
       
@@ -14,13 +71,27 @@ export default function ContactForm() {
           </p>
         </div>
 
-        <form onSubmit={(e) => e.preventDefault()}>
+        {status.message && (
+          <div className={`mb-8 p-4 text-sm font-sans rounded text-center border ${
+            status.type === 'success' 
+              ? 'bg-[#D9B56A]/10 text-[#D9B56A] border-[#D9B56A]/30' 
+              : 'bg-red-500/10 text-red-400 border-red-500/30'
+          }`}>
+            {status.message}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
           <div className="flex flex-col md:flex-row md:gap-8">
             <div className="flex-1">
               <div className="relative mb-10">
                 <input 
                   type="text" 
-                  className="w-full bg-transparent border-0 border-b border-[#B7AFC7]/30 text-[#F4F0EA] font-sans text-[15px] py-3 outline-none transition-colors duration-300 focus:border-[#D9B56A] placeholder:text-[#B7AFC7] placeholder:font-light" 
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  disabled={loading}
+                  className="w-full bg-transparent border-0 border-b border-[#B7AFC7]/30 text-[#F4F0EA] font-sans text-[15px] py-3 outline-none transition-colors duration-300 focus:border-[#D9B56A] placeholder:text-[#B7AFC7] placeholder:font-light disabled:opacity-50" 
                   placeholder="Your Name" 
                   required 
                 />
@@ -30,7 +101,11 @@ export default function ContactForm() {
               <div className="relative mb-10">
                 <input 
                   type="email" 
-                  className="w-full bg-transparent border-0 border-b border-[#B7AFC7]/30 text-[#F4F0EA] font-sans text-[15px] py-3 outline-none transition-colors duration-300 focus:border-[#D9B56A] placeholder:text-[#B7AFC7] placeholder:font-light" 
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  disabled={loading}
+                  className="w-full bg-transparent border-0 border-b border-[#B7AFC7]/30 text-[#F4F0EA] font-sans text-[15px] py-3 outline-none transition-colors duration-300 focus:border-[#D9B56A] placeholder:text-[#B7AFC7] placeholder:font-light disabled:opacity-50" 
                   placeholder="Your Email" 
                   required 
                 />
@@ -41,7 +116,11 @@ export default function ContactForm() {
           <div className="relative mb-10">
             <input 
               type="text" 
-              className="w-full bg-transparent border-0 border-b border-[#B7AFC7]/30 text-[#F4F0EA] font-sans text-[15px] py-3 outline-none transition-colors duration-300 focus:border-[#D9B56A] placeholder:text-[#B7AFC7] placeholder:font-light" 
+              name="subject"
+              value={formData.subject}
+              onChange={handleChange}
+              disabled={loading}
+              className="w-full bg-transparent border-0 border-b border-[#B7AFC7]/30 text-[#F4F0EA] font-sans text-[15px] py-3 outline-none transition-colors duration-300 focus:border-[#D9B56A] placeholder:text-[#B7AFC7] placeholder:font-light disabled:opacity-50" 
               placeholder="Subject / Service Requested" 
               required 
             />
@@ -49,7 +128,11 @@ export default function ContactForm() {
 
           <div className="relative mb-10">
             <textarea 
-              className="w-full bg-transparent border-0 border-b border-[#B7AFC7]/30 text-[#F4F0EA] font-sans text-[15px] py-3 outline-none transition-colors duration-300 focus:border-[#D9B56A] placeholder:text-[#B7AFC7] placeholder:font-light resize-none" 
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              disabled={loading}
+              className="w-full bg-transparent border-0 border-b border-[#B7AFC7]/30 text-[#F4F0EA] font-sans text-[15px] py-3 outline-none transition-colors duration-300 focus:border-[#D9B56A] placeholder:text-[#B7AFC7] placeholder:font-light resize-none disabled:opacity-50" 
               placeholder="Your Message" 
               rows="4" 
               required
@@ -58,9 +141,10 @@ export default function ContactForm() {
 
           <button 
             type="submit" 
-            className="w-full mt-4 bg-[#D9B56A] text-[#0A0713] py-4 md:py-5 font-sans text-[13px] font-semibold uppercase tracking-[2px] cursor-pointer transition-all duration-300 hover:bg-[#F4F0EA] hover:-translate-y-1"
+            disabled={loading}
+            className="w-full mt-4 bg-[#D9B56A] text-[#0A0713] py-4 md:py-5 font-sans text-[13px] font-semibold uppercase tracking-[2px] cursor-pointer transition-all duration-300 hover:bg-[#F4F0EA] hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
-            Send Message
+            {loading ? 'Sending...' : 'Send Message'}
           </button>
         </form>
       </div>

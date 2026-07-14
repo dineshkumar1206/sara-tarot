@@ -125,7 +125,7 @@ export default function Contact() {
             </motion.button>
 
             {/* Stat Boxes */}
-            <motion.div variants={fadeInUpVariants} className="flex flex-col sm:flex-row gap-6 mt-14">
+            {/* <motion.div variants={fadeInUpVariants} className="flex flex-col sm:flex-row gap-6 mt-14">
               <div className="bg-[#0A0713] border border-[#D9B56A]/15 p-8 text-center flex-1 transition-transform duration-300 hover:-translate-y-1">
                 <div className="font-serif text-[48px] text-[#F4F0EA] leading-none">96</div>
                 <div className="font-sans text-[10px] uppercase tracking-[1px] text-[#B7AFC7] mt-3">Tarot Reading Special</div>
@@ -134,7 +134,7 @@ export default function Contact() {
                 <div className="font-serif text-[48px] text-[#F4F0EA] leading-none">87</div>
                 <div className="font-sans text-[10px] uppercase tracking-[1px] text-[#B7AFC7] mt-3">Astrology Consultation</div>
               </div>
-            </motion.div>
+            </motion.div> */}
           </div>
 
           {/* Right Column: Embedded Map */}
