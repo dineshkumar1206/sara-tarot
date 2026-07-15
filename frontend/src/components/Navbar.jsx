@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
 import { logout } from '../store/slices/authSlice';
+import { API_BASE_URL } from '../config';
 
 export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIsCartOpen }) {
   const navigate = useNavigate();
@@ -9,6 +11,17 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
   const [isOpen, setIsOpen] = useState(false); // Mobile menu toggle
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Desktop dropdown toggle
   const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false); // Mobile sub-menu toggle
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    axios.get(`${API_BASE_URL}/api/categories`)
+      .then(res => {
+        setCategories(res.data);
+      })
+      .catch(err => {
+        console.error('Failed to load categories in Navbar:', err);
+      });
+  }, []);
 
   // Select admin auth state from Redux
   const user = useSelector(state => state.auth.user);
@@ -40,6 +53,43 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
       <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
     </svg>
   );
+
+  // Dynamic dropdown categories logic
+  const getCategoryPath = (cat) => {
+    const name = cat.name.toLowerCase();
+    if (name.includes('private consultation') || name.includes('consultation')) return '/products/tarot-consultation';
+    if (name.includes('spiritual healing') || name.includes('healing')) return '/products/spiritual-healing';
+    if (name.includes('murugar')) return '/products/murugar-cards';
+    if (name.includes('tarot card reading') || name.includes('tarot reading') || name.includes('tarot classes')) return '/products/tarot-classes';
+    if (name.includes('spiritual counseling') || name.includes('counseling')) return '/products/counseling-classes';
+    if (name.includes('kali pooja')) return '/products/kali-pooja';
+    return `/products/${cat.slug || cat.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+  };
+
+  const serviceCategories = categories.filter(c => c.type === 'service');
+  const dropdownItems = [];
+
+  if (serviceCategories.length > 0) {
+    serviceCategories.forEach((cat, idx) => {
+      if (idx === 2) {
+        dropdownItems.push({ label: 'Crystals', path: '/products/crystals' });
+      }
+      dropdownItems.push({ label: cat.name, path: getCategoryPath(cat) });
+    });
+    if (dropdownItems.findIndex(item => item.label === 'Crystals') === -1) {
+      dropdownItems.splice(2, 0, { label: 'Crystals', path: '/products/crystals' });
+    }
+  } else {
+    dropdownItems.push(
+      { label: 'Tarot Private Consultation', path: '/products/tarot-consultation' },
+      { label: 'Spiritual Healing', path: '/products/spiritual-healing' },
+      { label: 'Crystals', path: '/products/crystals' },
+      { label: 'Murugar Cards', path: '/products/murugar-cards' },
+      { label: 'Tarot Reading Classes', path: '/products/tarot-classes' },
+      { label: 'Spiritual Counseling', path: '/products/counseling-classes' },
+      { label: 'Kali Pooja', path: '/products/kali-pooja' }
+    );
+  }
 
   return (
     <nav 
@@ -157,15 +207,7 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
                     boxSizing: 'border-box'
                   }}
                 >
-                  {[
-                    { label: 'Tarot Private Consultation', path: '/products/tarot-consultation' },
-                    { label: 'Spiritual Healing', path: '/products/spiritual-healing' },
-                    { label: 'Crystals', path: '/products/crystals' },
-                    { label: 'Murugar Cards', path: '/products/murugar-cards' },
-                    { label: 'Tarot Reading Classes', path: '/products/tarot-classes' },
-                    { label: 'Spiritual Counseling', path: '/products/counseling-classes' },
-                    { label: 'Kali Pooja', path: '/products/kali-pooja' }
-                  ].map((subItem) => (
+                  {dropdownItems.map((subItem) => (
                     <Link
                       key={subItem.path}
                       to={subItem.path}
@@ -481,15 +523,7 @@ export default function Navbar({ cartItems = [], setCartItems, isCartOpen, setIs
                     boxSizing: 'border-box'
                   }}
                 >
-                  {[
-                    { label: 'Tarot Private Consultation', path: '/products/tarot-consultation' },
-                    { label: 'Spiritual Healing', path: '/products/spiritual-healing' },
-                    { label: 'Crystals', path: '/products/crystals' },
-                    { label: 'Murugar Cards', path: '/products/murugar-cards' },
-                    { label: 'Tarot Reading Classes', path: '/products/tarot-classes' },
-                    { label: 'Spiritual Counseling', path: '/products/counseling-classes' },
-                    { label: 'Kali Pooja', path: '/products/kali-pooja' }
-                  ].map((subItem) => (
+                  {dropdownItems.map((subItem) => (
                     <Link
                       key={subItem.path}
                       to={subItem.path}

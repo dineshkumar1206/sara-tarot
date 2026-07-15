@@ -46,6 +46,7 @@ const registerRoutes = (prefix) => {
   app.use(cleanPrefix === '/' ? '/api/auth' : `${cleanPrefix}api/auth`, require('./routes/auth'));
   app.use(cleanPrefix === '/' ? '/api/products' : `${cleanPrefix}api/products`, require('./routes/products'));
   app.use(cleanPrefix === '/' ? '/api/contact' : `${cleanPrefix}api/contact`, require('./routes/contact'));
+  app.use(cleanPrefix === '/' ? '/api/categories' : `${cleanPrefix}api/categories`, require('./routes/categories'));
   
   app.get(cleanPrefix === '/' ? '/' : cleanPrefix.slice(0, -1), (req, res) => {
     res.send('Saraa Tarot API is running...');
@@ -62,6 +63,7 @@ registerRoutes('/sara-tarot');
 
 const PORT = process.env.PORT || 5000;
 const User = require('./models/User');
+const Category = require('./models/Category');
 
 const seedAdminUser = async () => {
   try {
@@ -82,6 +84,39 @@ const seedAdminUser = async () => {
   }
 };
 
+const seedCategories = async () => {
+  try {
+    const count = await Category.count();
+    if (count === 0) {
+      const defaultCategories = [
+        // Crystals subcategories
+        { name: 'Rashi', type: 'crystal', desc: 'Specially energized crystals harmonized for your specific zodiac sign to bring balance and positive cosmic vibrations.', image: '/rashi.png', slug: 'rashi' },
+        { name: 'Dhanyog', type: 'crystal', desc: 'Attracts wealth, financial abundance, and prosperity into your home and business environment.', image: '/dhanyog.png', slug: 'dhanyog' },
+        { name: 'Bracelet', type: 'crystal', desc: 'Beautifully crafted bead bracelets for daily energetic protection, emotional peace, and spiritual support.', image: '/bracelet.png', slug: 'bracelet' },
+        { name: 'Karungali', type: 'crystal', desc: 'Made from authentic black ebony wood to absorb negative energy, bring good luck, and shield against evil eye.', image: '/karungali.png', slug: 'karungali' },
+        { name: 'Rudraksh', type: 'crystal', desc: 'Sacred natural beads representing peace, health, and spiritual focus. Ideal for meditation and prayer.', image: '/rudraksh.png', slug: 'rudraksh' },
+        { name: 'Yantra', type: 'crystal', desc: 'Sacred geometric plates designed to channel positive energy, shield against negativity, and bring success.', image: '/yantra.png', slug: 'yantra' },
+        { name: 'Pyrite', type: 'crystal', desc: 'The golden stone of luck, abundance, and business growth. Ideal for work tables and wealth manifestation.', image: '/pyrite.png', slug: 'pyrite' },
+        { name: 'Rings', type: 'crystal', desc: 'Sacred energized crystal rings to keep positive vibrations in close contact with your personal energy paths throughout the day.', image: '/rings.png', slug: 'rings' },
+        { name: 'Anklets', type: 'crystal', desc: 'Beautifully protective and grounding crystal anklets, energized to shield your aura and align lower body chakras.', image: '/anklets.png', slug: 'anklets' },
+        { name: 'Pendants', type: 'crystal', desc: 'Sacred crystal pendants charged to rest near your heart chakra, enhancing emotional healing, peace, and spiritual connection.', image: '/pendants.png', slug: 'pendants' },
+
+        // Spiritual services
+        { name: 'Tarot Private Consultation', type: 'service', desc: 'One-on-one personal guidance session with Sara to answer your life questions.', slug: 'tarot-consultation' },
+        { name: 'Spiritual Healing', type: 'service', desc: 'Blessed distance healing therapy to clean aura, manifest prosperity, and remove energetic blockages.', slug: 'spiritual-healing' },
+        { name: 'Murugar Cards', type: 'service', desc: 'Divine guidance cards inspired by Lord Murugar to help navigate your path.', slug: 'murugar-cards' },
+        { name: 'Tarot Card Reading', type: 'service', desc: 'Comprehensive learning classes to master tarot card reading.', slug: 'tarot-classes' },
+        { name: 'Spiritual Counseling', type: 'service', desc: 'Counseling and guidance sessions for mental clarity, peace, and alignment.', slug: 'counseling-classes' },
+        { name: 'Kali Pooja', type: 'service', desc: 'Holy Amavasya Kali Poojas to ward off evil, remove blocks, and invite positive energy.', slug: 'kali-pooja' }
+      ];
+      await Category.bulkCreate(defaultCategories);
+      console.log('Default categories seeded into database.');
+    }
+  } catch (err) {
+    console.error('Failed to seed categories:', err);
+  }
+};
+
 // Start the server immediately so it listens on the port (preventing 503 errors on live hosting)
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
@@ -95,6 +130,7 @@ app.listen(PORT, () => {
     .then(async () => {
       console.log('Database tables synchronized.');
       await seedAdminUser();
+      await seedCategories();
     })
     .catch(err => {
       console.error('Unable to connect to the database:', err);

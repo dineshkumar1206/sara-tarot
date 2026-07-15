@@ -38,6 +38,21 @@ const CRYSTAL_CATEGORIES = [
     name: 'Pyrite',
     desc: 'The golden stone of luck, abundance, and business growth. Ideal for work tables and wealth manifestation.',
     image: '/pyrite.png'
+  },
+  {
+    name: 'Rings',
+    desc: 'Sacred energized crystal rings to keep positive vibrations in close contact with your personal energy paths throughout the day.',
+    image: '/rings.png'
+  },
+  {
+    name: 'Anklets',
+    desc: 'Beautifully protective and grounding crystal anklets, energized to shield your aura and align lower body chakras.',
+    image: '/anklets.png'
+  },
+  {
+    name: 'Pendants',
+    desc: 'Sacred crystal pendants charged to rest near your heart chakra, enhancing emotional healing, peace, and spiritual connection.',
+    image: '/pendants.png'
   }
 ];
 
@@ -58,6 +73,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [healingPowerChecked, setHealingPowerChecked] = useState(false);
+  const [crystalCategories, setCrystalCategories] = useState([]);
 
   useEffect(() => {
     if (subcategoryParam) {
@@ -70,16 +86,25 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
   useEffect(() => {
     const fetchCrystals = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/products`);
-        const crystalCatNames = CRYSTAL_CATEGORIES.map(c => c.name.toLowerCase());
-        const crystalItems = res.data.filter(item => 
+        const [prodRes, catRes] = await Promise.all([
+          axios.get(`${API_BASE_URL}/api/products`),
+          axios.get(`${API_BASE_URL}/api/categories`)
+        ]);
+
+        const crystalsList = catRes.data.filter(c => c.type === 'crystal');
+        setCrystalCategories(crystalsList);
+
+        const crystalCatNames = crystalsList.map(c => c.name.toLowerCase());
+        const crystalItems = prodRes.data.filter(item => 
           item.category && crystalCatNames.includes(item.category.toLowerCase())
         );
         setItems(crystalItems);
       } catch (err) {
         console.error('Failed to load crystals from database. Using fallback seed data.', err);
-        // Map local fallback items
-        const fallbacks = CRYSTAL_CATEGORIES.map((cat, idx) => ({
+        // Fallback using current hardcoded categories list
+        const fallbackList = CRYSTAL_CATEGORIES;
+        setCrystalCategories(fallbackList);
+        const fallbacks = fallbackList.map((cat, idx) => ({
           id: `fallback-${idx}`,
           name: `${cat.name} Crystal Product`,
           price: 1500 + idx * 100,
@@ -187,7 +212,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
           </h1>
           <p style={{ color: 'rgba(243, 240, 234, 0.8)', fontSize: '1.05rem', lineHeight: '1.7', maxWidth: '800px', margin: '0 0 2rem 0' }}>
             {(() => {
-              const catData = CRYSTAL_CATEGORIES.find(c => c.name.toLowerCase() === (selectedCategory || '').toLowerCase());
+              const catData = crystalCategories.find(c => c.name.toLowerCase() === (selectedCategory || '').toLowerCase());
               return catData ? catData.desc : 'A curated selection of natural crystal categories, hand-selected, cleansed, and programmed with specific intentions by Sara to support your healing and manifest your desires.';
             })()}
           </p>
@@ -222,7 +247,7 @@ export default function Crystals({ cart = [], setCart, setIsCartOpen }) {
             >
               All Crystals
             </button>
-            {CRYSTAL_CATEGORIES.map((cat) => (
+            {crystalCategories.map((cat) => (
               <button
                 key={cat.name}
                 onClick={() => setSearchParams({ subcategory: cat.name })}

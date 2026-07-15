@@ -2,25 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
-import { Plus, Pencil, Trash2, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, AlertCircle, CheckCircle, Settings, Menu } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import { API_BASE_URL } from '../config';
 
 // Component Imports
-import AdminNavbar from './AdminNavbar'; // Adjust the import path based on your folder structure
-
-const CRYSTAL_CATEGORIES = ['Rashi', 'Dhanyog', 'Bracelet', 'Karungali', 'Rudraksh', 'Yantra', 'Pyrite'];
-const SERVICE_CATEGORIES = [
-  'Tarot Private Consultation',
-  'Spiritual Healing',
-  'Murugar Cards',
-  'Tarot Card Reading',
-  'Spiritual Counseling',
-  'Kali Pooja'
-];
-const ALL_CATEGORIES = [...CRYSTAL_CATEGORIES, ...SERVICE_CATEGORIES];
-const CRYSTAL_AND_KALI_CATEGORIES = [...CRYSTAL_CATEGORIES, 'Kali Pooja'];
-const SERVICE_ONLY_CATEGORIES = SERVICE_CATEGORIES.filter(cat => cat !== 'Kali Pooja');
+import AdminNavbar from './AdminNavbar'; 
 
 export default function ControlDesk() {
   const navigate = useNavigate();
@@ -30,15 +17,16 @@ export default function ControlDesk() {
   const token = useSelector(state => state.auth.token);
   const user = useSelector(state => state.auth.user) || {};
 
-  // Active Category Sidebar Tab Selection
+  // Active Category Selection
   const [activeCategory, setActiveCategory] = useState('Tarot Private Consultation');
 
-  // Products state
+  // Products and Categories states
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  // Modal / Form state
+  // Product Modal / Form state
   const [showModal, setShowModal] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
@@ -56,24 +44,49 @@ export default function ControlDesk() {
     inclusions: ''
   });
 
+  // Category Modal / Form state
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [catFormLoading, setCatFormLoading] = useState(false);
+  const [catFormError, setCatFormError] = useState('');
+  const [catFormSuccess, setCatFormSuccess] = useState('');
+  const [catImageFile, setCatImageFile] = useState(null);
+
+  const [catFormData, setCatFormData] = useState({
+    id: null,
+    name: '',
+    type: 'service', // 'crystal' or 'service'
+    desc: '',
+    image: ''
+  });
+
   // Verify auth
   useEffect(() => {
     if (!token) {
       navigate('/login');
       return;
     }
-    fetchProducts();
+    fetchData();
   }, [token, navigate]);
 
-  const fetchProducts = async () => {
+  const fetchData = async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/products`);
-      setProducts(res.data);
+      const [prodRes, catRes] = await Promise.all([
+        axios.get(`${API_BASE_URL}/api/products`),
+        axios.get(`${API_BASE_URL}/api/categories`)
+      ]);
+      setProducts(prodRes.data);
+      setCategories(catRes.data);
+      
+      // Auto select first category if current is not in the loaded list
+      const loadedCatNames = catRes.data.map(c => c.name);
+      if (loadedCatNames.length > 0 && !loadedCatNames.includes(activeCategory) && activeCategory !== '_manage_menus') {
+        setActiveCategory(loadedCatNames[0]);
+      }
     } catch (err) {
       console.error(err);
-      setError('Failed to fetch crystals from the database.');
+      setError('Failed to fetch data from the database.');
     } finally {
       setLoading(false);
     }
@@ -84,13 +97,24 @@ export default function ControlDesk() {
     navigate('/');
   };
 
+  // Check if a category belongs to Crystals
+  const isCrystalCategory = (catName) => {
+    const found = categories.find(c => c.name.toLowerCase() === (catName || '').toLowerCase());
+    return found ? found.type === 'crystal' : false;
+  };
+
+  // Check if a category matches Kali Pooja
+  const isKaliPoojaCategory = (catName) => {
+    return (catName || '').toLowerCase() === 'kali pooja';
+  };
+
   const openAddModal = () => {
-    const isCrystalOrKali = CRYSTAL_AND_KALI_CATEGORIES.includes(activeCategory);
+    const isCrystal = isCrystalCategory(activeCategory);
     setFormData({
       id: null,
       name: '',
       price: '',
-      type: isCrystalOrKali ? 'Blessed & Energized' : 'Duration: 40 minutes',
+      type: isCrystal ? 'Blessed & Energized' : 'Duration: 40 minutes',
       category: activeCategory,
       desc: '',
       image: '',
@@ -103,12 +127,12 @@ export default function ControlDesk() {
   };
 
   const openEditModal = (product) => {
-    const isCrystalOrKali = CRYSTAL_AND_KALI_CATEGORIES.includes(product.category || activeCategory);
+    const isCrystal = isCrystalCategory(product.category || activeCategory);
     setFormData({
       id: product.id,
       name: product.name,
       price: product.price,
-      type: product.type || (isCrystalOrKali ? 'Blessed & Energized' : 'Duration: 40 minutes'),
+      type: product.type || (isCrystal ? 'Blessed & Energized' : 'Duration: 40 minutes'),
       category: product.category || activeCategory,
       desc: product.desc || '',
       image: product.image || '',
@@ -121,7 +145,7 @@ export default function ControlDesk() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this crystal?')) return;
+    if (!window.confirm('Are you sure you want to delete this listing?')) return;
     try {
       await axios.delete(`${API_BASE_URL}/api/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -144,8 +168,8 @@ export default function ControlDesk() {
     setFormSuccess('');
     setFormLoading(true);
 
-    const isCrystalOrKali = CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category);
-    const inclusionsArray = isCrystalOrKali
+    const isCrystal = isCrystalCategory(formData.category);
+    const inclusionsArray = isCrystal
       ? formData.inclusions
           .split('\n')
           .map(item => item.trim())
@@ -160,7 +184,7 @@ export default function ControlDesk() {
     fd.append('desc', formData.desc);
     fd.append('inclusions', JSON.stringify(inclusionsArray));
 
-    if (isCrystalOrKali) {
+    if (isCrystal) {
       if (imageFile) {
         fd.append('image', imageFile);
       } else {
@@ -176,13 +200,13 @@ export default function ControlDesk() {
           headers: { Authorization: `Bearer ${token}` }
         });
         setProducts(products.map(p => p.id === formData.id ? res.data : p));
-        setFormSuccess('Crystal updated successfully!');
+        setFormSuccess('Listing updated successfully!');
       } else {
         const res = await axios.post(`${API_BASE_URL}/api/products`, fd, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setProducts([...products, res.data]);
-        setFormSuccess('New crystal added successfully!');
+        setFormSuccess('New listing added successfully!');
       }
 
       setTimeout(() => {
@@ -201,6 +225,101 @@ export default function ControlDesk() {
     }
   };
 
+  // ─── CATEGORY MANAGEMENT ACTIONS ───
+
+  const openAddCategoryModal = () => {
+    setCatFormData({
+      id: null,
+      name: '',
+      type: 'service',
+      desc: '',
+      image: ''
+    });
+    setCatImageFile(null);
+    setCatFormError('');
+    setCatFormSuccess('');
+    setShowCategoryModal(true);
+  };
+
+  const openEditCategoryModal = (cat) => {
+    setCatFormData({
+      id: cat.id,
+      name: cat.name,
+      type: cat.type,
+      desc: cat.desc || '',
+      image: cat.image || ''
+    });
+    setCatImageFile(null);
+    setCatFormError('');
+    setCatFormSuccess('');
+    setShowCategoryModal(true);
+  };
+
+  const handleDeleteCategory = async (id) => {
+    if (!window.confirm('Warning: Deleting this menu/category will not delete its products, but they will no longer be visible under this category tab. Are you sure you want to delete this menu?')) return;
+    try {
+      await axios.delete(`${API_BASE_URL}/api/categories/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCategories(categories.filter(c => c.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete category. Please try again.');
+    }
+  };
+
+  const handleCatInputChange = (e) => {
+    const { name, value } = e.target;
+    setCatFormData({ ...catFormData, [name]: value });
+  };
+
+  const handleCatFormSubmit = async (e) => {
+    e.preventDefault();
+    setCatFormError('');
+    setCatFormSuccess('');
+    setCatFormLoading(true);
+
+    const fd = new FormData();
+    fd.append('name', catFormData.name);
+    fd.append('type', catFormData.type);
+    fd.append('desc', catFormData.desc);
+
+    if (catImageFile) {
+      fd.append('image', catImageFile);
+    } else {
+      fd.append('image', catFormData.image);
+    }
+
+    try {
+      if (catFormData.id) {
+        const res = await axios.put(`${API_BASE_URL}/api/categories/${catFormData.id}`, fd, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setCategories(categories.map(c => c.id === catFormData.id ? res.data : c));
+        setCatFormSuccess('Category updated successfully!');
+      } else {
+        const res = await axios.post(`${API_BASE_URL}/api/categories`, fd, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setCategories([...categories, res.data]);
+        setCatFormSuccess('New category created successfully!');
+      }
+
+      setTimeout(() => {
+        setShowCategoryModal(false);
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      if (err.response && err.response.data && err.response.data.message) {
+        setCatFormError(err.response.data.message);
+      } else {
+        setCatFormError('Failed to save category details.');
+      }
+    } finally {
+      setCatFormLoading(false);
+    }
+  };
+
   const filteredProducts = products.filter(
     (product) => product.category && product.category.toLowerCase() === activeCategory.toLowerCase()
   );
@@ -208,267 +327,564 @@ export default function ControlDesk() {
   return (
     <div className="min-h-screen bg-[#090514] text-[#F4F0EA] flex flex-col font-sans">
       
-      {/* ─── IMPORTED NAVBAR PANEL ─── */}
+      {/* ─── NAVBAR PANEL ─── */}
       <AdminNavbar 
         user={user}
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
         handleSignOut={handleSignOut}
+        categories={categories}
       />
 
       {/* ─── MAIN PANEL ─── */}
       <main className="flex-grow p-6 md:p-8 max-w-[1400px] mx-auto w-full overflow-y-auto">
         
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-[#D9B56A]/10 pb-6">
+        {activeCategory === '_manage_menus' ? (
+          /* ─── CATEGORY MANAGEMENT DASHBOARD VIEW ─── */
           <div>
-            <h2 className="font-['Cinzel'] text-3xl font-normal text-[#D9B56A] tracking-wide">
-              {activeCategory} Collection
-            </h2>
-            <p className="text-[13px] text-[#B7AFC7] mt-1">
-              Manage listings published under the {activeCategory} category.
-            </p>
-          </div>
-          
-          <button
-            onClick={openAddModal}
-            className="flex items-center gap-2 bg-[#D9B56A] text-[#0A0713] px-5 py-3 rounded-lg text-[13px] font-semibold uppercase tracking-[0.5px] hover:bg-[#F4F0EA] transition-colors duration-200 cursor-pointer shadow-[0_4px_15px_rgba(217,181,106,0.15)]"
-          >
-            <Plus size={16} />
-            <span>Add Product</span>
-          </button>
-        </div>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-[#D9B56A]/10 pb-6">
+              <div>
+                <h2 className="font-['Cinzel'] text-3xl font-normal text-[#D9B56A] tracking-wide">
+                  Manage Menu Categories
+                </h2>
+                <p className="text-[13px] text-[#B7AFC7] mt-1">
+                  Add, edit, or remove top-level Spiritual Services and Crystal subcategories.
+                </p>
+              </div>
+              
+              <button
+                onClick={openAddCategoryModal}
+                className="flex items-center gap-2 bg-[#D9B56A] text-[#0A0713] px-5 py-3 rounded-lg text-[13px] font-semibold uppercase tracking-[0.5px] hover:bg-[#F4F0EA] transition-colors duration-200 cursor-pointer shadow-[0_4px_15px_rgba(217,181,106,0.15)]"
+              >
+                <Plus size={16} />
+                <span>Add Category / Menu</span>
+              </button>
+            </div>
 
-        {/* Loading / Error States */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="animate-spin text-[#D9B56A] mb-4" size={40} />
-            <p className="text-[#B7AFC7] text-sm font-sans">Loading listings...</p>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg flex items-center gap-3 mb-6 font-sans">
-            <AlertCircle size={20} />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
-
-        {/* Grid of Listings */}
-        {!loading && !error && (
-          <>
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-20 border border-dashed border-[#D9B56A]/20 rounded-xl font-sans">
-                <p className="text-[#B7AFC7] text-[15px]">No products found in the {activeCategory} category.</p>
-                <button
-                  onClick={openAddModal}
-                  className="text-[#D9B56A] underline mt-2 text-sm font-semibold hover:text-white"
-                >
-                  Create first product for {activeCategory}
-                </button>
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className="animate-spin text-[#D9B56A] mb-4" size={40} />
+                <p className="text-[#B7AFC7] text-sm">Loading menus...</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
-                  <div 
-                    key={product.id}
-                    className="bg-[#130f24] border border-[#D9B56A]/15 rounded-xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-[#D9B56A]/40"
-                  >
-                    {/* Card Image */}
-                    <div className="w-full h-[160px] aspect-video overflow-hidden relative bg-[#0A0713] flex items-center justify-center">
-                      {CRYSTAL_AND_KALI_CATEGORIES.includes(product.category) ? (
-                        product.image ? (
-                          <img 
-                            src={product.image} 
-                            alt={product.name} 
-                            className="w-full h-full object-cover" 
-                            onError={(e) => {
-                              e.target.onerror = null; 
-                              e.target.src = '/saraa-logo.jpeg';
-                            }}
-                          />
-                        ) : (
-                          <img 
-                            src="/saraa-logo.jpeg" 
-                            alt={product.name} 
-                            className="w-full h-full object-cover opacity-60" 
-                          />
-                        )
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[#1c1635] to-[#0A0713] flex flex-col items-center justify-center p-4">
-                          <span className="text-[10px] text-[#D9B56A] uppercase font-bold tracking-[0.2em] mb-1">
-                            {product.category}
-                          </span>
-                          <span className="text-[12px] text-[#B7AFC7] text-center font-medium font-sans">
-                            {product.type}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+                {/* Spiritual Services Column */}
+                <div className="bg-[#130f24]/50 border border-[#D9B56A]/10 rounded-xl p-6">
+                  <h3 className="font-['Cinzel'] text-lg text-[#D9B56A] border-b border-[#D9B56A]/10 pb-3 mb-4">
+                    Spiritual Services Menus
+                  </h3>
+                  <div className="space-y-3">
+                    {categories.filter(c => c.type === 'service').map(cat => (
+                      <div key={cat.id} className="flex justify-between items-center bg-[#130f24] border border-[#D9B56A]/10 rounded-lg p-4 hover:border-[#D9B56A]/20 transition-all">
+                        <div>
+                          <h4 className="font-semibold text-[14px] text-white">{cat.name}</h4>
+                          <p className="text-[11px] text-[#B7AFC7] mt-0.5 line-clamp-1 max-w-[300px]">{cat.desc || 'No description provided.'}</p>
+                          <span className="inline-block mt-2 text-[9px] font-bold uppercase tracking-wider bg-[#D9B56A]/10 text-[#D9B56A] px-2 py-0.5 rounded">
+                            Slug: {cat.slug}
                           </span>
                         </div>
-                      )}
-                      <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#130f24] to-transparent" />
-                    </div>
-
-                    {/* Card Content */}
-                    <div className="p-5 flex-grow flex flex-col justify-between font-sans">
-                      <div>
-                        <span className="text-[9px] text-[#D9B56A] uppercase font-bold tracking-widest">
-                          {product.type || 'Blessed & Energized'}
-                        </span>
-                        <h4 className="text-[17px] text-white font-medium mt-1 mb-2 leading-tight">
-                          {product.name}
-                        </h4>
-                        <p className="text-[12px] text-[#B7AFC7] line-clamp-3 leading-relaxed mb-4">
-                          {product.desc}
-                        </p>
-                      </div>
-
-                      <div>
-                        <div className="text-[20px] font-bold text-[#D9B56A] mb-4">
-                          ₹{product.price.toLocaleString('en-IN')}
-                        </div>
-
-                        {/* Actions Row */}
-                        <div className="flex gap-3 border-t border-[#D9B56A]/10 pt-4">
-                          <button
-                            onClick={() => openEditModal(product)}
-                            className="flex-1 flex items-center justify-center gap-1.5 bg-transparent text-[#D9B56A] hover:text-white border border-[#D9B56A]/30 hover:border-[#D9B56A]/60 py-2 rounded-lg text-[12px] font-semibold uppercase tracking-[0.5px] transition-colors duration-200 cursor-pointer"
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => openEditCategoryModal(cat)}
+                            className="p-2 text-[#B7AFC7] hover:text-[#D9B56A] hover:bg-[#D9B56A]/5 rounded transition-all cursor-pointer"
+                            title="Edit Menu"
                           >
-                            <Pencil size={13} />
-                            <span>Edit</span>
+                            <Pencil size={15} />
                           </button>
-                          
-                          <button
-                            onClick={() => handleDelete(product.id)}
-                            className="flex-1 flex items-center justify-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 py-2 rounded-lg text-[12px] font-semibold uppercase tracking-[0.5px] transition-colors duration-200 cursor-pointer"
+                          <button 
+                            onClick={() => handleDeleteCategory(cat.id)}
+                            className="p-2 text-red-400 hover:text-red-500 hover:bg-red-500/5 rounded transition-all cursor-pointer"
+                            title="Delete Menu"
                           >
-                            <Trash2 size={13} />
-                            <span>Delete</span>
+                            <Trash2 size={15} />
                           </button>
                         </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                {/* Crystals Subcategories Column */}
+                <div className="bg-[#130f24]/50 border border-[#D9B56A]/10 rounded-xl p-6">
+                  <h3 className="font-['Cinzel'] text-lg text-[#D9B56A] border-b border-[#D9B56A]/10 pb-3 mb-4">
+                    Crystals Collection Menus
+                  </h3>
+                  <div className="space-y-3">
+                    {categories.filter(c => c.type === 'crystal').map(cat => (
+                      <div key={cat.id} className="flex justify-between items-center bg-[#130f24] border border-[#D9B56A]/10 rounded-lg p-4 hover:border-[#D9B56A]/20 transition-all">
+                        <div className="flex gap-3 items-center">
+                          {cat.image && (
+                            <img src={cat.image} alt={cat.name} className="w-10 h-10 object-cover rounded border border-[#D9B56A]/20" />
+                          )}
+                          <div>
+                            <h4 className="font-semibold text-[14px] text-white">{cat.name}</h4>
+                            <p className="text-[11px] text-[#B7AFC7] mt-0.5 line-clamp-1 max-w-[250px]">{cat.desc || 'No description provided.'}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => openEditCategoryModal(cat)}
+                            className="p-2 text-[#B7AFC7] hover:text-[#D9B56A] hover:bg-[#D9B56A]/5 rounded transition-all cursor-pointer"
+                            title="Edit Menu"
+                          >
+                            <Pencil size={15} />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteCategory(cat.id)}
+                            className="p-2 text-red-400 hover:text-red-500 hover:bg-red-500/5 rounded transition-all cursor-pointer"
+                            title="Delete Menu"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
-          </>
+          </div>
+        ) : (
+          /* ─── PRODUCTS LIST VIEW ─── */
+          <div>
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-[#D9B56A]/10 pb-6">
+              <div>
+                <h2 className="font-['Cinzel'] text-3xl font-normal text-[#D9B56A] tracking-wide">
+                  {activeCategory} Collection
+                </h2>
+                <p className="text-[13px] text-[#B7AFC7] mt-1">
+                  Manage listings published under the {activeCategory} category.
+                </p>
+              </div>
+              
+              <button
+                onClick={openAddModal}
+                className="flex items-center gap-2 bg-[#D9B56A] text-[#0A0713] px-5 py-3 rounded-lg text-[13px] font-semibold uppercase tracking-[0.5px] hover:bg-[#F4F0EA] transition-colors duration-200 cursor-pointer shadow-[0_4px_15px_rgba(217,181,106,0.15)]"
+              >
+                <Plus size={16} />
+                <span>Add Product / Item</span>
+              </button>
+            </div>
+
+            {/* Loading / Error States */}
+            {loading && (
+              <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className="animate-spin text-[#D9B56A] mb-4" size={40} />
+                <p className="text-[#B7AFC7] text-sm font-sans">Loading listings...</p>
+              </div>
+            )}
+
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg flex items-center gap-3 mb-6 font-sans">
+                <AlertCircle size={20} />
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
+
+            {/* Grid of Listings */}
+            {!loading && !error && (
+              <>
+                {filteredProducts.length === 0 ? (
+                  <div className="text-center py-20 border border-dashed border-[#D9B56A]/20 rounded-xl font-sans">
+                    <p className="text-[#B7AFC7] text-[15px]">No products found in the {activeCategory} category.</p>
+                    <button
+                      onClick={openAddModal}
+                      className="text-[#D9B56A] underline mt-2 text-sm font-semibold hover:text-white"
+                    >
+                      Create first listing for {activeCategory}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredProducts.map((product) => (
+                      <div 
+                        key={product.id}
+                        className="bg-[#130f24] border border-[#D9B56A]/15 rounded-xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-[#D9B56A]/40"
+                      >
+                        {/* Card Image */}
+                        <div className="w-full h-[160px] aspect-video overflow-hidden relative bg-[#0A0713] flex items-center justify-center">
+                          {isCrystalCategory(product.category) || isKaliPoojaCategory(product.category) ? (
+                            product.image ? (
+                              <img 
+                                src={product.image} 
+                                alt={product.name} 
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-xs text-gray-600 font-medium">No Image Uploaded</span>
+                            )
+                          ) : (
+                            <div className="flex flex-col items-center gap-1.5 p-4 text-center">
+                              <span className="text-xs text-[#D9B56A] font-bold uppercase tracking-wider">Service Booking</span>
+                              <span className="text-[10px] text-gray-500 max-w-[200px] truncate">{product.name}</span>
+                            </div>
+                          )}
+                          
+                          <div className="absolute top-3 right-3 bg-[#0A0713]/80 border border-[#D9B56A]/20 px-2.5 py-1 rounded text-[10px] text-[#D9B56A] font-bold uppercase tracking-wider backdrop-blur-sm">
+                            ₹{product.price}
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-5 flex-grow flex flex-col justify-between">
+                          <div>
+                            <div className="flex justify-between items-start gap-2 mb-1.5">
+                              <h3 className="font-semibold text-base text-white tracking-wide leading-tight">
+                                {product.name}
+                              </h3>
+                            </div>
+                            <p className="text-[11px] text-[#D9B56A] font-bold uppercase tracking-wider mb-2.5">
+                              {product.type}
+                            </p>
+                            <p className="text-xs text-[#B7AFC7] leading-relaxed mb-4 line-clamp-3">
+                              {product.desc || 'No description provided.'}
+                            </p>
+
+                            {/* Inclusions */}
+                            {Array.isArray(product.inclusions) && product.inclusions.length > 0 && (
+                              <div className="border-t border-[#D9B56A]/10 pt-3 mt-3">
+                                <span className="text-[9px] text-[#D9B56A] font-bold uppercase tracking-widest block mb-1">Inclusions:</span>
+                                <ul className="space-y-1">
+                                  {product.inclusions.map((inc, i) => (
+                                    <li key={i} className="text-[11px] text-[#B7AFC7] flex items-center gap-1.5">
+                                      <span className="w-1 h-1 bg-[#D9B56A] rounded-full shrink-0" />
+                                      <span className="truncate">{inc}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex gap-2.5 mt-5 pt-3 border-t border-[#D9B56A]/10">
+                            <button
+                              onClick={() => openEditModal(product)}
+                              className="flex-1 flex items-center justify-center gap-1.5 bg-[#D9B56A]/10 hover:bg-[#D9B56A]/20 border border-[#D9B56A]/20 text-[#D9B56A] py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors duration-200 cursor-pointer"
+                            >
+                              <Pencil size={12} />
+                              <span>Edit</span>
+                            </button>
+                            <button
+                              onClick={() => handleDelete(product.id)}
+                              className="flex-1 flex items-center justify-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors duration-200 cursor-pointer"
+                            >
+                              <Trash2 size={12} />
+                              <span>Delete</span>
+                            </button>
+                          </div>
+                        </div>
+
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         )}
       </main>
 
-      {/* ─── ADD/EDIT FORM MODAL ─── */}
+      {/* ─── PRODUCT ADD / EDIT MODAL ─── */}
       {showModal && (
-        <div className="fixed inset-0 bg-[#0A0713]/80 backdrop-blur-md flex items-center justify-center z-50 p-4 overflow-y-auto">
-          
-          <div 
-            className="bg-[#130f24] border border-[#D9B56A]/30 rounded-2xl w-full max-w-[540px] max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Close */}
-            <button 
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl font-light cursor-pointer"
-            >
-              &times;
-            </button>
-
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 overflow-y-auto backdrop-blur-sm">
+          <div className="bg-[#130f24] border border-[#D9B56A]/30 w-full max-w-lg rounded-xl shadow-[0_15px_50px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-[90vh]">
             {/* Modal Header */}
-            <h3 className="font-['Cinzel'] text-2xl font-normal text-[#D9B56A] tracking-wide mb-6">
-              {formData.id 
-                ? (CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category) ? 'Edit Product' : 'Edit Service / Offer') 
-                : (CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category) ? 'Add Product' : 'Add Service / Offer')}
-            </h3>
+            <div className="px-6 py-4 border-b border-[#D9B56A]/10 flex justify-between items-center">
+              <h3 className="font-['Cinzel'] text-lg font-normal text-[#D9B56A] uppercase tracking-wider">
+                {formData.id ? 'Edit Item' : 'Add Item'}
+              </h3>
+              <button 
+                onClick={() => setShowModal(false)}
+                className="text-[#B7AFC7] hover:text-white text-lg font-semibold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
 
-            {formError && (
-              <div className="mb-4 text-xs text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-lg flex items-center gap-2">
-                <AlertCircle size={15} />
-                <span>{formError}</span>
-              </div>
-            )}
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto flex-grow">
+              {formError && (
+                <div className="mb-4 text-xs text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-lg flex items-center gap-2">
+                  <AlertCircle size={15} />
+                  <span>{formError}</span>
+                </div>
+              )}
 
-            {formSuccess && (
-              <div className="mb-4 text-xs text-green-400 bg-green-500/10 border border-green-500/20 p-3 rounded-lg flex items-center gap-2">
-                <CheckCircle size={15} />
-                <span>{formSuccess}</span>
-              </div>
-            )}
+              {formSuccess && (
+                <div className="mb-4 text-xs text-green-400 bg-green-500/10 border border-green-500/20 p-3 rounded-lg flex items-center gap-2">
+                  <CheckCircle size={15} />
+                  <span>{formSuccess}</span>
+                </div>
+              )}
 
-            {/* Form */}
-            <form onSubmit={handleFormSubmit} className="space-y-4 text-sm font-sans">
-              
-              {/* Product/Service Name */}
-              <div>
-                <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
-                  {CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category) ? 'Product Name *' : 'Service Title / Name *'}
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder={CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category) ? 'e.g. Dhanyog Crystal' : 'e.g. Relationship Healing Session'}
-                  required
-                  className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200"
-                />
-              </div>
-
-              {/* Grid 2-col (Price & Type) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Price */}
+              {/* Form */}
+              <form onSubmit={handleFormSubmit} className="space-y-4 text-sm font-sans">
+                
+                {/* Name */}
                 <div>
                   <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
-                    Price (INR) *
+                    {isCrystalCategory(formData.category) ? 'Product Name *' : 'Service Title / Name *'}
                   </label>
                   <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
+                    type="text"
+                    name="name"
+                    value={formData.name}
                     onChange={handleInputChange}
-                    placeholder="e.g. 1800"
+                    placeholder={isCrystalCategory(formData.category) ? 'e.g. Dhanyog Crystal' : 'e.g. Relationship Healing Session'}
                     required
                     className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200"
                   />
                 </div>
 
-                {/* Type / Duration */}
+                {/* Price & Type */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
+                      Price (INR) *
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleInputChange}
+                      placeholder="e.g. 1800"
+                      required
+                      className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
+                      {isCrystalCategory(formData.category) ? 'Product Type' : 'Duration / Session Type *'}
+                    </label>
+                    <input
+                      type="text"
+                      name="type"
+                      value={formData.type}
+                      onChange={handleInputChange}
+                      required={!isCrystalCategory(formData.category)}
+                      placeholder={isCrystalCategory(formData.category) ? 'e.g. Blessed & Energized' : 'e.g. Duration: 40 minutes'}
+                      className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200"
+                    />
+                  </div>
+                </div>
+
+                {/* Category selector */}
                 <div>
                   <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
-                    {CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category) ? 'Product Type' : 'Duration / Session Type *'}
+                    Category Menu Selection *
+                  </label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200"
+                  >
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.name} className="bg-[#130f24] text-white">
+                        {cat.name} ({cat.type})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Image Upload Area */}
+                {(isCrystalCategory(formData.category) || isKaliPoojaCategory(formData.category)) && (
+                  <div>
+                    <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
+                      Item Image
+                    </label>
+                    
+                    <div style={{
+                      border: '2px dashed rgba(217, 181, 106, 0.3)',
+                      borderRadius: '8px',
+                      padding: '1.5rem',
+                      textAlign: 'center',
+                      backgroundColor: 'rgba(10, 7, 19, 0.4)',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.borderColor = 'rgba(217, 181, 106, 0.6)'}
+                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(217, 181, 106, 0.3)'}
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setImageFile(e.target.files[0] || null)}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          opacity: 0,
+                          cursor: 'pointer'
+                        }}
+                      />
+                      
+                      {imageFile ? (
+                        <div className="flex flex-col items-center">
+                          <img 
+                            src={URL.createObjectURL(imageFile)} 
+                            alt="Selected Preview" 
+                            style={{ maxHeight: '120px', borderRadius: '4px', marginBottom: '0.5rem' }} 
+                          />
+                          <span className="text-xs text-[#D9B56A] font-semibold truncate max-w-[250px]">
+                            {imageFile.name}
+                          </span>
+                          <span className="text-[10px] text-gray-500 mt-1">Click or drag to change image</span>
+                        </div>
+                      ) : formData.image ? (
+                        <div className="flex flex-col items-center">
+                          <img 
+                            src={formData.image} 
+                            alt="Current Product Preview" 
+                            style={{ maxHeight: '120px', borderRadius: '4px', marginBottom: '0.5rem' }} 
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                          <span className="text-xs text-gray-400">Current Image Loaded</span>
+                          <span className="text-[10px] text-gray-500 mt-1">Click or drag to replace image</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center py-2 text-[#B7AFC7]">
+                          <span className="text-[13px] font-medium">Drag file here or click to upload</span>
+                          <span className="text-[10px] text-gray-500 mt-0.5">Supports PNG, JPG, JPEG (Max 5MB)</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Description */}
+                <div>
+                  <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
+                    Item Description
+                  </label>
+                  <textarea
+                    name="desc"
+                    value={formData.desc}
+                    onChange={handleInputChange}
+                    rows="3"
+                    placeholder="Provide a detailed description of the product or healing service..."
+                    className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200 resize-none"
+                  />
+                </div>
+
+                {/* Inclusions (Crystals Only) */}
+                {isCrystalCategory(formData.category) && (
+                  <div>
+                    <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
+                      Inclusions (one item per line)
+                    </label>
+                    <textarea
+                      name="inclusions"
+                      value={formData.inclusions}
+                      onChange={handleInputChange}
+                      rows="3"
+                      placeholder="e.g.&#10;Spiritually cleansed and energized&#10;Sacred prasadham included"
+                      className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200 resize-none"
+                    />
+                  </div>
+                )}
+
+                {/* Submit button */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={formLoading}
+                    className="w-full flex items-center justify-center gap-2 bg-[#D9B56A] text-[#0A0713] py-3 rounded-lg text-xs font-bold uppercase tracking-[1px] hover:bg-[#F4F0EA] transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {formLoading ? (
+                      <>
+                        <Loader2 className="animate-spin" size={16} />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <span>Save Changes</span>
+                    )}
+                  </button>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── CATEGORY ADD / EDIT MODAL ─── */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 overflow-y-auto backdrop-blur-sm">
+          <div className="bg-[#130f24] border border-[#D9B56A]/30 w-full max-w-lg rounded-xl shadow-[0_15px_50px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-[#D9B56A]/10 flex justify-between items-center">
+              <h3 className="font-['Cinzel'] text-lg font-normal text-[#D9B56A] uppercase tracking-wider">
+                {catFormData.id ? 'Edit Menu Category' : 'Add Menu Category'}
+              </h3>
+              <button 
+                onClick={() => setShowCategoryModal(false)}
+                className="text-[#B7AFC7] hover:text-white text-lg font-semibold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-grow">
+              {catFormError && (
+                <div className="mb-4 text-xs text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-lg flex items-center gap-2">
+                  <AlertCircle size={15} />
+                  <span>{catFormError}</span>
+                </div>
+              )}
+
+              {catFormSuccess && (
+                <div className="mb-4 text-xs text-green-400 bg-green-500/10 border border-green-500/20 p-3 rounded-lg flex items-center gap-2">
+                  <CheckCircle size={15} />
+                  <span>{catFormSuccess}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleCatFormSubmit} className="space-y-4 text-sm font-sans">
+                
+                {/* Menu Name */}
+                <div>
+                  <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
+                    Menu Name *
                   </label>
                   <input
                     type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleInputChange}
-                    required={!CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category)}
-                    placeholder={CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category) ? 'e.g. Blessed & Energized' : 'e.g. Duration: 40 minutes'}
+                    name="name"
+                    value={catFormData.name}
+                    onChange={handleCatInputChange}
+                    placeholder="e.g. Anklets, Tarot Card Reading, Aura Healing"
+                    required
                     className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200"
                   />
                 </div>
-              </div>
 
-              {/* Category selector */}
-              <div>
-                <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
-                  {CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category) ? 'Product Category' : 'Service Category'}
-                </label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200"
-                >
-                  {(CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category) ? CRYSTAL_AND_KALI_CATEGORIES : SERVICE_ONLY_CATEGORIES).map(cat => (
-                    <option key={cat} value={cat} className="bg-[#130f24] text-white">
-                      {cat}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Image Upload Area */}
-              {CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category) && (
+                {/* Menu Type */}
                 <div>
                   <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
-                    Product Image
+                    Menu Section / Type *
+                  </label>
+                  <select
+                    name="type"
+                    value={catFormData.type}
+                    onChange={handleCatInputChange}
+                    className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200"
+                  >
+                    <option value="service" className="bg-[#130f24] text-white">Spiritual Service (Main Navbar dropdown list)</option>
+                    <option value="crystal" className="bg-[#130f24] text-white">Crystal Category (Crystals page subcategories list)</option>
+                  </select>
+                </div>
+
+                {/* Image Upload Area (Optional, useful for crystals) */}
+                <div>
+                  <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
+                    Category Icon / Image (Optional)
                   </label>
                   
                   <div style={{
@@ -487,7 +903,7 @@ export default function ControlDesk() {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => setImageFile(e.target.files[0] || null)}
+                      onChange={(e) => setCatImageFile(e.target.files[0] || null)}
                       style={{
                         position: 'absolute',
                         top: 0,
@@ -499,107 +915,76 @@ export default function ControlDesk() {
                       }}
                     />
                     
-                    {imageFile ? (
+                    {catImageFile ? (
                       <div className="flex flex-col items-center">
                         <img 
-                          src={URL.createObjectURL(imageFile)} 
+                          src={URL.createObjectURL(catImageFile)} 
                           alt="Selected Preview" 
-                          style={{ maxHeight: '120px', borderRadius: '4px', marginBottom: '0.5rem' }} 
+                          style={{ maxHeight: '100px', borderRadius: '4px', marginBottom: '0.5rem' }} 
                         />
                         <span className="text-xs text-[#D9B56A] font-semibold truncate max-w-[250px]">
-                          {imageFile.name}
+                          {catImageFile.name}
                         </span>
-                        <span className="text-[10px] text-gray-500 mt-1">Click or drag to change image</span>
                       </div>
-                    ) : formData.image ? (
+                    ) : catFormData.image ? (
                       <div className="flex flex-col items-center">
                         <img 
-                          src={formData.image} 
-                          alt="Current Product Preview" 
-                          style={{ maxHeight: '120px', borderRadius: '4px', marginBottom: '0.5rem' }} 
+                          src={catFormData.image} 
+                          alt="Category Preview" 
+                          style={{ maxHeight: '100px', borderRadius: '4px', marginBottom: '0.5rem' }} 
                           onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = '/saraa-logo.jpeg';
+                            e.currentTarget.style.display = 'none';
                           }}
                         />
-                        <span className="text-xs text-[#B7AFC7] truncate max-w-[250px]">
-                          Current Image
-                        </span>
-                        <span className="text-[10px] text-gray-500 mt-1">Click or drag to replace image</span>
+                        <span className="text-xs text-gray-400">Current Category Image</span>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center py-4">
-                        <Plus className="text-[#D9B56A] mb-2" size={24} />
-                        <span className="text-xs text-[#B7AFC7] font-medium">Click or drag image file here</span>
-                        <span className="text-[10px] text-gray-500 mt-1">Supports PNG, JPG, JPEG, GIF</span>
+                      <div className="flex flex-col items-center py-2 text-[#B7AFC7]">
+                        <span className="text-[12px] font-medium">Click to upload icon image</span>
                       </div>
                     )}
                   </div>
                 </div>
-              )}
 
-              {/* Description */}
-              <div>
-                <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
-                  Description
-                </label>
-                <textarea
-                  name="desc"
-                  rows="3"
-                  value={formData.desc}
-                  onChange={handleInputChange}
-                  placeholder={CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category) ? 'Provide crystal healing benefits...' : 'Provide service details and session coverage...'}
-                  className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200 resize-none"
-                />
-              </div>
-
-              {/* Inclusions */}
-              {CRYSTAL_AND_KALI_CATEGORIES.includes(formData.category) && (
+                {/* Description */}
                 <div>
                   <label className="block text-[11px] text-[#B7AFC7] uppercase tracking-[1px] mb-1 font-medium">
-                    Product Inclusions (One item per line)
+                    Menu/Category Description
                   </label>
                   <textarea
-                    name="inclusions"
+                    name="desc"
+                    value={catFormData.desc}
+                    onChange={handleCatInputChange}
                     rows="3"
-                    value={formData.inclusions}
-                    onChange={handleInputChange}
-                    placeholder="e.g.&#10;Spiritually cleansed and energized&#10;Couriered with sacred prasadham"
+                    placeholder="Short description displayed on page headings..."
                     className="w-full px-4 py-2.5 rounded-lg bg-[#0A0713]/60 border border-[#D9B56A]/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D9B56A]/50 focus:bg-[#0A0713]/90 transition-all duration-200 resize-none"
                   />
                 </div>
-              )}
 
-              {/* Submit Buttons */}
-              <div className="flex gap-4 pt-4 border-t border-[#D9B56A]/10 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 bg-transparent hover:bg-white/5 border border-gray-600 hover:border-gray-400 py-3 rounded-lg font-semibold uppercase tracking-[0.5px] text-[12px] text-white transition-colors duration-200 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                
-                <button
-                  type="submit"
-                  disabled={formLoading}
-                  className="flex-1 bg-[#D9B56A] text-[#0A0713] hover:bg-[#F4F0EA] py-3 rounded-lg font-semibold uppercase tracking-[0.5px] text-[12px] transition-colors duration-200 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  {formLoading ? (
-                    <>
-                      <Loader2 className="animate-spin" size={14} />
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    <span>Save Product</span>
-                  )}
-                </button>
-              </div>
+                {/* Submit button */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={catFormLoading}
+                    className="w-full flex items-center justify-center gap-2 bg-[#D9B56A] text-[#0A0713] py-3 rounded-lg text-xs font-bold uppercase tracking-[1px] hover:bg-[#F4F0EA] transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {catFormLoading ? (
+                      <>
+                        <Loader2 className="animate-spin" size={16} />
+                        <span>Saving Menu...</span>
+                      </>
+                    ) : (
+                      <span>Save Menu Category</span>
+                    )}
+                  </button>
+                </div>
 
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }
